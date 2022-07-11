@@ -1,2 +1,7 @@
-# crypto-wallet-helper
-addition app for crypto-wallets
+# wallet_connect_test1
+
+Flutter app for crypto wallets
+
+## Getting Started
+
+Main
