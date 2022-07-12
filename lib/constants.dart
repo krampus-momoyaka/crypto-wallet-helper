@@ -6,12 +6,13 @@ const sMainTitle = "WalletConnect";
 mixin mColors {
 
   static const lightGray = Color(0xFFa0aec1);
+  static const white = Color(0xFFFFFFFF);
   static const walletColor = Color(0xFF3B99FC);
   static const pubKeyColor = Color(0xFFE6F1FB);
   static const light = Color(0xFFf0f0ef);
   static const appBarColor = MaterialColor(0xFFf0f0ef, <int, Color>{0: Color(0xFFf0f0ef)});
   static const gold = Color(0xFFffd700);
-
+  static const shadowGray = Color(0x30000000);
 }
 
 mixin mNetworks  {

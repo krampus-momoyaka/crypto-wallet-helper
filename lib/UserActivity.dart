@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:wallet_application/NFTHelper.dart';
 import 'package:wallet_application/add_network_page.dart';
 import 'package:wallet_application/change_network_dialog.dart';
 import 'package:wallet_application/constants.dart';
@@ -78,6 +80,8 @@ class _UserActivityPageState extends State<UserActivityPage> {
   var instaEnabled = false;
 
   var sendEnabled = false;
+
+  List<Asset> nfts = [];
 
   double amount = 0;
   String initialAmount = '0.0';
@@ -161,7 +165,11 @@ class _UserActivityPageState extends State<UserActivityPage> {
           }
         });
       }
+
+
     });
+
+    _getNfts();
 
     mWallet.updateCallback = (){
       setState(() {
@@ -177,6 +185,28 @@ class _UserActivityPageState extends State<UserActivityPage> {
         }
       });
     };
+  }
+
+  _getNfts() async{
+
+    var list =  await NFT.getTestNFT(mWallet.account);
+    if(list!=null) {
+      setState(() {
+        // nfts
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0]);
+        nfts = list;
+      });
+    }
+
   }
 
   _initDB() async {
@@ -217,6 +247,11 @@ class _UserActivityPageState extends State<UserActivityPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
+    final double itemHeight = (size.height - kToolbarHeight - 24) / 2.9;
+    final double itemWidth = size.width / 2;
+
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -775,6 +810,84 @@ class _UserActivityPageState extends State<UserActivityPage> {
                         ],
                       ),
                     ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Container(
+                            margin: EdgeInsets.fromLTRB(16, 24, 0, 0),
+                            child: Text("OpenSea Gallery",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: mColors.lightGray))
+                        ),
+                      ],
+                    ),
+
+                    Container(
+                      padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
+                      margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                      decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          GridView.builder(
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: (itemWidth / itemHeight),
+                                  crossAxisSpacing: 0,
+                                  mainAxisSpacing: 0),
+                              itemCount: nfts.length,
+                              shrinkWrap: true,
+                              physics: NeverScrollableScrollPhysics(),
+                              itemBuilder: (BuildContext ctx, index) {
+                                return Container(
+                                  margin: EdgeInsets.all(6),
+                                  decoration: BoxDecoration(
+                                    //Here goes the same radius, u can put into a var or function
+                                    borderRadius:
+                                    BorderRadius.circular(10),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: mColors.shadowGray,
+                                        spreadRadius:0,
+                                        blurRadius: 1,
+                                        offset: Offset(0.0, 2.0)
+                                      ),
+                                    ],
+                                  ),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Container(
+
+                                      //margin: EdgeInsets.only(bottom: 10),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Center(child: Image.network(nfts[index].imageUrl, height:itemWidth-20, fit: BoxFit.contain,)),
+                                          Container(
+                                            child: Text(nfts[index].name,
+                                              style: TextStyle(), textAlign: TextAlign.start, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                            margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                          )
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                      //  borderRadius: BorderRadius.circular(10),
+                                        color: nfts[index].backgroundColor == null ? mColors.white: nfts[index].backgroundColor,
+                                        // boxShadow: [ BoxShadow(
+                                        //   color: Colors.grey,
+                                        //   offset: Offset(3.0, 3.0), //(x,y)
+                                        //   blurRadius: 3.0,
+                                        //   )
+                                        // ],
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),

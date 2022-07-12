@@ -18,6 +18,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:wallet_application/Contacts/widget/avatar_widget.dart';
+import 'package:wallet_application/NFTHelper.dart';
 import 'package:wallet_application/UserActivity.dart';
 import 'package:wallet_application/change_network_dialog.dart';
 import 'package:wallet_application/constants.dart';
@@ -716,9 +717,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
                                           //mWallet.sendRaw();
 
+                                           //var nfts = await NFT.getTestNFT("0x65EB1b6A3Ab979B45e55Ffc560ccD8E072839fb3");
 
 
-                                          showToast(FirebaseHelper.notificationData,context: context);
+
+                                          //showToast(FirebaseHelper.notificationData,context: context);
                                           Clipboard.setData(ClipboardData(text: mWallet.account));
                                         },
                                         child: Container(
