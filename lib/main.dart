@@ -19,6 +19,7 @@ import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:wallet_application/Contacts/widget/avatar_widget.dart';
 import 'package:wallet_application/NFTHelper.dart';
+import 'package:wallet_application/NFTScreen.dart';
 import 'package:wallet_application/UserActivity.dart';
 import 'package:wallet_application/change_network_dialog.dart';
 import 'package:wallet_application/constants.dart';
@@ -231,6 +232,10 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<Device> devices = [];
   List<User> users = [];
+  List<Asset> nfts = [];
+
+
+
   late NearbyService nearbyService;
 
   bool blueInit = false;
@@ -283,6 +288,14 @@ class _ProfilePageState extends State<ProfilePage> {
       await _initDB();
       initBluetooth();
     });
+
+    users.add(User('vlados','0x4158615616156165156156'));
+    users.add(User('vlados','0x4158615616156165156156'));
+    users.add(User('vlados','0x4158615616156165156156'));
+    users.add(User('vlados','0x4158615616156165156156'));
+    users.add(User('vlados','0x4158615616156165156156'));
+    users.add(User('vlados','0x4158615616156165156156'));
+    _getNfts();
 
   }
 
@@ -428,8 +441,35 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
 
+  _getNfts() async{
+
+    var list =  await NFT.getTestNFT(mWallet.account);
+    if(list!=null) {
+      setState(() {
+        // nfts
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0])
+        //   ..add(list[0]);
+        nfts = list;
+      });
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
+
+    var size = MediaQuery.of(context).size;
+    final double itemHeight = (size.height - kToolbarHeight - 24) / 2.9;
+    final double itemWidth = size.width / 2;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -492,11 +532,13 @@ class _ProfilePageState extends State<ProfilePage> {
 
                     });
                   };
+
                   await mWallet.updateBalance();
 
                   setState(() {
 
                   });
+                  _getNfts();
                 },
                 child: SingleChildScrollView(
                   physics: const AlwaysScrollableScrollPhysics(),
@@ -504,179 +546,227 @@ class _ProfilePageState extends State<ProfilePage> {
                     constraints: BoxConstraints(
                       minHeight: viewportConstraints.maxHeight,
                     ),
-                    child:   Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        //user info
-                        Container(
-                          margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(20),
-                              bottomRight: Radius.circular(20))),
-                          child: Material(
-                            color: Colors.transparent,
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Column(
-                                  children: [
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-                                      child: CircleAvatar(
-                                        radius: 50,
-                                        backgroundColor: Colors.white,
-                                        child: ClipOval(
-                                          child: image,
+                    child:   Container(
+                      color: mColors.light,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          //user info
+                          Container(
+                            margin: EdgeInsets.fromLTRB(0, 0, 0, 20),
+                            padding: EdgeInsets.all(8),
+                            decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(20),
+                                bottomRight: Radius.circular(20))),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Column(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(15, 10, 15, 0),
+                                        child: CircleAvatar(
+                                          radius: 50,
+                                          backgroundColor: Colors.white,
+                                          child: ClipOval(
+                                            child: image,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Visibility(
-                                      visible: true,
-                                      child: Container(
-                                        padding : EdgeInsets.fromLTRB(4, 0, 0, 0),
-                                        child: TextButton(
-                                            key: const Key('chenge_icon'),
-                                            // style: ElevatedButton.styleFrom(
-                                            //   splashFactory: NoSplash.splashFactory,
-                                            // ),
-                                            onPressed: () async {
+                                      Visibility(
+                                        visible: true,
+                                        child: Container(
+                                          padding : EdgeInsets.fromLTRB(4, 0, 0, 0),
+                                          child: TextButton(
+                                              key: const Key('chenge_icon'),
+                                              // style: ElevatedButton.styleFrom(
+                                              //   splashFactory: NoSplash.splashFactory,
+                                              // ),
+                                              onPressed: () async {
 
-                                              final imageNew = (await ImagePicker().pickImage(source: ImageSource.gallery).whenComplete(() => {
-                                              }));
-                                              if(imageNew!=null) {
-                                                setState(() {
-                                                  imagePath = imageNew.path;
-                                                  image = Image.file(
-                                                    File(imagePath),
-                                                    fit: BoxFit.scaleDown,
-                                                    width: 150,
-                                                    height: 150,
-                                                  );
-                                                  _updateUserDB();
-                                                });
-                                              }
-                                              var i = 0;
+                                                final imageNew = (await ImagePicker().pickImage(source: ImageSource.gallery).whenComplete(() => {
+                                                }));
+                                                if(imageNew!=null) {
+                                                  setState(() {
+                                                    imagePath = imageNew.path;
+                                                    image = Image.file(
+                                                      File(imagePath),
+                                                      fit: BoxFit.scaleDown,
+                                                      width: 150,
+                                                      height: 150,
+                                                    );
+                                                    _updateUserDB();
+                                                  });
+                                                }
+                                                var i = 0;
 
 
-                                            },
-                                            child: Text("Set New Photo", style: TextStyle(fontSize: 17,color: Colors.black)
-                                              ,)
+                                              },
+                                              child: Text("Set New Photo", style: TextStyle(fontSize: 17,color: Colors.black)
+                                                ,)
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
 
-                                Visibility(
-                                  visible: !_userNameVisibility,
-                                  child: Container(
-                                    width: 150,
-                                    margin: const EdgeInsets.fromLTRB(0, 35, 0, 0),
-                                    child: TextField(
-                                      maxLength: 15,
-                                      controller: userNameController,
-                                      style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                                  Visibility(
+                                    visible: !_userNameVisibility,
+                                    child: Container(
+                                      width: 150,
+                                      margin: const EdgeInsets.fromLTRB(0, 35, 0, 0),
+                                      child: TextField(
+                                        maxLength: 15,
+                                        controller: userNameController,
+                                        style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),
+                                      ),
                                     ),
                                   ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(0, 45, 0, 0),
-                                  child: Visibility(
-                                      visible: _userNameVisibility,
-                                      child: Text(userName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(0, 30, 15, 0),
-                                  child:
-                                  IconButton(
-                                    //padding: const EdgeInsets.all(3),
-                                      onPressed: (){
-                                        setState(() {
-                                          if(_userNameVisibility){
-                                            userNameController.text = userName;
-                                            _editIcom = Icon(Icons.check);
-                                          }else{
-                                            userName = userNameController.text;
+                                  Container(
+                                    margin: const EdgeInsets.fromLTRB(0, 45, 0, 0),
+                                    child: Visibility(
+                                        visible: _userNameVisibility,
+                                        child: Text(userName, style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),)),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.fromLTRB(0, 30, 15, 0),
+                                    child:
+                                    IconButton(
+                                      //padding: const EdgeInsets.all(3),
+                                        onPressed: (){
+                                          setState(() {
+                                            if(_userNameVisibility){
+                                              userNameController.text = userName;
+                                              _editIcom = Icon(Icons.check);
+                                            }else{
+                                              userName = userNameController.text;
 
-                                            _editIcom = Icon(Icons.mode_edit);
-                                            _updateUserDB();
-                                          }
+                                              _editIcom = Icon(Icons.mode_edit);
+                                              _updateUserDB();
+                                            }
 
-                                          _userNameVisibility = !_userNameVisibility;
+                                            _userNameVisibility = !_userNameVisibility;
 
 
-                                        });
+                                          });
 
-                                      },
-                                      icon: _editIcom),
-                                )
-                              ],
+                                        },
+                                        icon: _editIcom),
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        //wallet
-                        Container(
-                          padding: EdgeInsets.all(8),
-                          margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                          decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+                          //wallet
+                          Container(
+                            padding: EdgeInsets.all(8),
+                            margin: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
 
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-                                child: Text("Connected via ${mWallet.provider?.connector.session.peerMeta?.name.toString()}",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                              ),
-                              Row(
-                                children:  <Widget>[
-                                  Container(
-                                    margin: const EdgeInsets.fromLTRB(20, 0, 27, 15),
-                                    child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Flexible(
-                                    child: Container(
-                                      margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+                                  child: Text("Connected via ${mWallet.provider?.connector.session.peerMeta?.name.toString()}",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+                                ),
+                                Row(
+                                  children:  <Widget>[
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(20, 0, 27, 15),
+                                      child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Flexible(
+                                      child: Container(
+                                        margin: EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                        child: Material(
+                                          color:  mColors.pubKeyColor,
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: InkWell(
+                                            borderRadius: BorderRadius.circular(20),
+                                            onTap: () async {
+                                              mWallet.updateCallback = (){
+                                                setState(() {
+
+                                                });
+                                              };
+                                              AlertDialog ad = await buildNetworkDialog(context);
+                                              showDialog(context: context, builder: (context){
+                                                return ad;
+                                              }).then((net) async {
+                                                final tx = await mWallet.changeNetwork(net);
+                                                print("Switch Chain TX: "+tx.toString());
+                                                if(tx is int){
+                                                  showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
+
+                                                }else {
+                                                  if (tx.toString() !=
+                                                      'JSON-RPC error -32000: User rejected the request.') {
+                                                    if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
+                                                      setState(() {
+                                                        requestAddChain(net);
+                                                      });
+                                                    } else {
+
+                                                    }
+                                                  }
+                                                  else {
+                                                    showToast('Request rejected',
+                                                        context: context,
+                                                        duration: Duration(
+                                                            seconds: 5));
+                                                  }
+                                                }
+
+                                              });
+                                            },
+                                            child: Container(
+                                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                              padding: const EdgeInsets.all(10),
+                                              decoration: BoxDecoration(color: Colors.transparent),
+                                              child:
+                                              Text(
+                                                  mWallet.currentNet.name,
+                                                  overflow: TextOverflow.ellipsis
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children:  <Widget>[
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(20, 0, 15, 0),
+                                      child: Text("Public key:",style: TextStyle(fontWeight: FontWeight.bold),),
+                                    ),
+                                    Flexible(
                                       child: Material(
-                                        color:  mColors.pubKeyColor,
+                                        color: mColors.pubKeyColor,
                                         borderRadius: BorderRadius.circular(20),
                                         child: InkWell(
                                           borderRadius: BorderRadius.circular(20),
                                           onTap: () async {
-                                            mWallet.updateCallback = (){
-                                              setState(() {
 
-                                              });
-                                            };
-                                            AlertDialog ad = await buildNetworkDialog(context);
-                                            showDialog(context: context, builder: (context){
-                                              return ad;
-                                            }).then((net) async {
-                                              final tx = await mWallet.changeNetwork(net);
-                                              print("Switch Chain TX: "+tx.toString());
-                                              if(tx is int){
-                                                showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
 
-                                              }else {
-                                                if (tx.toString() !=
-                                                    'JSON-RPC error -32000: User rejected the request.') {
-                                                  if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
-                                                    setState(() {
-                                                      requestAddChain(net);
-                                                    });
-                                                  } else {
 
-                                                  }
-                                                }
-                                                else {
-                                                  showToast('Request rejected',
-                                                      context: context,
-                                                      duration: Duration(
-                                                          seconds: 5));
-                                                }
-                                              }
 
-                                            });
+
+                                            //final s = tx.toString();
+
+
+                                            //mWallet.sendRaw();
+
+                                             //var nfts = await NFT.getTestNFT("0x65EB1b6A3Ab979B45e55Ffc560ccD8E072839fb3");
+
+
+
+                                            //showToast(FirebaseHelper.notificationData,context: context);
+                                            Clipboard.setData(ClipboardData(text: mWallet.account));
                                           },
                                           child: Container(
                                             margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
@@ -684,223 +774,310 @@ class _ProfilePageState extends State<ProfilePage> {
                                             decoration: BoxDecoration(color: Colors.transparent),
                                             child:
                                             Text(
-                                                mWallet.currentNet.name,
+                                                mWallet.account,
                                                 overflow: TextOverflow.ellipsis
                                             ),
                                           ),
                                         ),
                                       ),
+                                    )
+                                  ],
+                                ),
+                                Row(
+                                  children:  <Widget>[
+                                    Container(
+                                      margin: const EdgeInsets.fromLTRB(20, 15, 27, 15),
+                                      child: Text("Balance:",style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children:  <Widget>[
-                                  Container(
-                                    margin: const EdgeInsets.fromLTRB(20, 0, 15, 0),
-                                    child: Text("Public key:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Flexible(
-                                    child: Material(
-                                      color: mColors.pubKeyColor,
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.circular(20),
-                                        onTap: () async {
+                                    Container(
+                                        margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
+                                        padding: const EdgeInsets.all(10),
+                                        //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
+                                        child:
+                                        Text(mWallet.balance.getValueInUnit(EtherUnit.ether).toString() + " ${mWallet.currentNet.coinName}")
 
-
-
-
-
-                                          //final s = tx.toString();
-
-
-                                          //mWallet.sendRaw();
-
-                                           //var nfts = await NFT.getTestNFT("0x65EB1b6A3Ab979B45e55Ffc560ccD8E072839fb3");
-
-
-
-                                          //showToast(FirebaseHelper.notificationData,context: context);
-                                          Clipboard.setData(ClipboardData(text: mWallet.account));
-                                        },
-                                        child: Container(
-                                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                          padding: const EdgeInsets.all(10),
-                                          decoration: BoxDecoration(color: Colors.transparent),
-                                          child:
-                                          Text(
-                                              mWallet.account,
-                                              overflow: TextOverflow.ellipsis
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Row(
-                                children:  <Widget>[
-                                  Container(
-                                    margin: const EdgeInsets.fromLTRB(20, 15, 27, 15),
-                                    child: Text("Balance:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                  ),
-                                  Container(
-                                      margin: const EdgeInsets.fromLTRB(0, 15, 0, 15),
-                                      padding: const EdgeInsets.all(10),
-                                      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
-                                      child:
-                                      Text(mWallet.balance.getValueInUnit(EtherUnit.ether).toString() + " ${mWallet.currentNet.coinName}")
-
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          //ble
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.fromLTRB(16, 24, 0, 0),
+                                  child: Text("People nearby",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: mColors.Gay))
                               ),
                             ],
                           ),
-                        ),
-                        //ble
-                        Container(
-                          constraints: BoxConstraints(
-                              minHeight: 150, minWidth: double.infinity, maxHeight: 300),
-                          padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.fromLTRB(10, 15, 10, 10),
-                          decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
-                          child: Column(
-                            //mainAxisSize: MainAxisSize.max,
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            margin: EdgeInsets.fromLTRB(3,0, 3, 0),
+                            decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+                            child: Column(
+                              //mainAxisSize: MainAxisSize.max,
+                              children: [
+
+                                Container(
+                                  padding: EdgeInsets.all(10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Text(
+                                            "Public Mode",
+                                          ),
+                                          Switch(
+                                            value: isPublic,
+                                            onChanged: (value) {
+
+
+                                              setState(() {
+                                                isPublic = value;
+                                                print(isPublic);
+                                                _changePublicMode(value);
+                                              });
+                                            },
+                                            activeTrackColor: Colors.lightGreenAccent,
+                                            activeColor: Colors.green,
+                                          ),
+                                        ],
+                                      ),
+                                      Material(
+                                        color: Colors.transparent,
+                                        child: IconButton(
+                                            onPressed:(){
+                                              setState(() {
+                                                _updateUserDB();
+                                              });
+
+
+                                            },
+                                            icon: const Icon(IconData(
+                                                0xe514,
+                                                fontFamily: 'MaterialIcons'
+                                            )
+                                            )
+                                        ),
+                                      )
+
+                                    ],
+                                  ),
+                                ),
+                                ConstrainedBox(
+                                  constraints: BoxConstraints(maxHeight: 300, minHeight: 0),
+                                  child: ShaderMask(
+                                    shaderCallback: (Rect bounds) {
+                                      return LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        stops: [0.0, 0.02, 0.98, 1.0],
+                                        colors: <Color>[mColors.white,Colors.transparent,Colors.transparent,mColors.white],
+                                      ).createShader(bounds);
+                                    },
+                                    blendMode: BlendMode.dstOut,
+                                    child: ListView.builder(
+                                        shrinkWrap: true,
+                                        //physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: getItemCount(),
+                                        itemBuilder: (context, index) {
+                                          final user = users[index];
+                                          return Container(
+                                            decoration: BoxDecoration(
+                                              color: mColors.white,
+                                              //Here goes the same radius, u can put into a var or function
+                                              borderRadius:
+                                              BorderRadius.circular(10),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: mColors.shadowGray,
+                                                    spreadRadius:0.8,
+                                                    blurRadius: 1.3,
+                                                    offset: Offset(0.0, 1.0)
+                                                ),
+                                              ],
+                                            ),
+
+                                            margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                                            child: Material(
+                                              color: Colors.transparent,
+                                              child: InkWell(
+                                                onTap: () async {
+                                                  if(user!=null) {
+
+                                                    //await connectUser(user);
+                                                    if(user.pubKey!="null") {
+                                                      Navigator.push(context,
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  UserActivity(
+                                                                      user: user))
+                                                      );
+                                                    }
+                                                  }else{
+                                                    showToast("Failed",
+                                                        context: context,
+                                                        axis: Axis.horizontal,
+                                                        alignment: Alignment.center,
+                                                        position: StyledToastPosition.bottom);
+                                                  }
+                                                },
+                                                child: Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child:
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Container(
+                                                              padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                                              margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                                                              child:_deviceTextName(user),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10.0,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                    ),
+                                                    // GestureDetector(
+                                                    //   onTap: () => connectUser(user),
+                                                    //   child: Container(
+                                                    //     margin: EdgeInsets.symmetric(horizontal: 8.0),
+                                                    //     padding: EdgeInsets.all(8.0),
+                                                    //     height: 35,
+                                                    //     width: 100,
+                                                    //     color: getButtonColor(user.device!.state),
+                                                    //     child: Center(
+                                                    //       child: Text(
+                                                    //         getButtonStateName(user.device!.state),
+                                                    //         style: TextStyle(
+                                                    //             color: Colors.white,
+                                                    //             fontWeight: FontWeight.bold),
+                                                    //       ),
+                                                    //     ),
+                                                    //   ),
+                                                    // )
+                                                  ],
+
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          //nft
+
+                          nfts.isNotEmpty? Column(
                             children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  Container(
+                                      margin: EdgeInsets.fromLTRB(16, 24, 0, 0),
+                                      child: Text("OpenSea Gallery",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: mColors.Gay))
+                                  ),
+                                ],
+                              ),
 
                               Container(
-                                padding: EdgeInsets.all(10),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
+                                margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                                decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Expanded(child: Text("People nearby", style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),)),
-                                    const Text(
-                                      "Public Mode",
-                                    ),
-                                    Switch(
-                                      value: isPublic,
-                                      onChanged: (value) {
 
-
-                                        setState(() {
-                                          isPublic = value;
-                                          print(isPublic);
-                                          _changePublicMode(value);
-                                        });
-                                      },
-                                      activeTrackColor: Colors.lightGreenAccent,
-                                      activeColor: Colors.green,
-                                    ),
-                                    // TextButton(child: Text("BLE"),onPressed: (){
-                                    //     Navigator.push(context, MaterialPageRoute(builder:  (context) => Blue2()));
-                                    //   },
-                                    // ),
-                                    Material(
-                                      color: Colors.transparent,
-                                      child: IconButton(
-                                          onPressed:(){
-                                            setState(() {
-                                              _updateUserDB();
-                                            });
-
-
-                                          },
-                                          icon: const Icon(IconData(
-                                              0xe514,
-                                              fontFamily: 'MaterialIcons'
-                                          )
-                                          )
-                                      ),
-                                    )
-
+                                    GridView.builder(
+                                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            childAspectRatio: (itemWidth / itemHeight),
+                                            crossAxisSpacing: 0,
+                                            mainAxisSpacing: 0),
+                                        itemCount: nfts.length,
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemBuilder: (BuildContext ctx, index) {
+                                          return Material(
+                                            type: MaterialType.transparency,
+                                            child: Container(
+                                              margin: EdgeInsets.all(6),
+                                              decoration: BoxDecoration(
+                                                //Here goes the same radius, u can put into a var or function
+                                                borderRadius:
+                                                BorderRadius.circular(10),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      color: mColors.shadowGray,
+                                                      spreadRadius:0.8,
+                                                      blurRadius: 1.3,
+                                                      offset: Offset(0.0, 1.0)
+                                                  ),
+                                                ],
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(10),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    //  borderRadius: BorderRadius.circular(10),
+                                                    color: nfts[index].backgroundColor == null ? mColors.white: nfts[index].backgroundColor,
+                                                    // boxShadow: [ BoxShadow(
+                                                    //   color: Colors.grey,
+                                                    //   offset: Offset(3.0, 3.0), //(x,y)
+                                                    //   blurRadius: 3.0,
+                                                    //   )
+                                                    // ],
+                                                  ),
+                                                  child: Material(
+                                                    type: MaterialType.transparency,
+                                                    child: InkWell(
+                                                      splashColor: mColors.Gay,
+                                                      onTap: (){
+                                                        Navigator.push(context, MaterialPageRoute(builder: (context){
+                                                          return NFTScreen(nft: nfts[index]);
+                                                        }));
+                                                      },
+                                                      child: Ink(
+                                                        child: Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children: [
+                                                            Center(
+                                                                child: Image.network(
+                                                                  nfts[index].imageUrl,
+                                                                  height:itemWidth-20,
+                                                                  fit: BoxFit.contain,
+                                                                )
+                                                            ),
+                                                            Container(
+                                                              child: Text(nfts[index].name,
+                                                                style: TextStyle(), textAlign: TextAlign.start, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                              margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                                              padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
                                   ],
                                 ),
                               ),
-                              Expanded(
-                                child: ListView.builder(
-                                    shrinkWrap: true,
-                                    //physics: const NeverScrollableScrollPhysics(),
-                                    itemCount: getItemCount(),
-                                    itemBuilder: (context, index) {
-                                      final user = users[index];
-                                      return Container(
-                                        margin: EdgeInsets.all(5),
-                                        child: Material(
-                                          color: Colors.transparent,
-                                          child: InkWell(
-                                            onTap: () async {
-                                              if(user!=null) {
-
-                                                //await connectUser(user);
-                                                if(user.pubKey!="null") {
-                                                  Navigator.push(context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) =>
-                                                              UserActivity(
-                                                                  user: user))
-                                                  );
-                                                }
-                                              }else{
-                                                showToast("Failed",
-                                                    context: context,
-                                                    axis: Axis.horizontal,
-                                                    alignment: Alignment.center,
-                                                    position: StyledToastPosition.bottom);
-                                              }
-                                            },
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child:
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Container(
-                                                          padding: EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                                          margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
-                                                          child:_deviceTextName(user),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 10.0,
-                                                        ),
-                                                        Divider(
-                                                          height: 0.5,
-                                                          color: Colors.grey,
-                                                        )
-                                                      ],
-                                                    ),
-                                                ),
-                                                // GestureDetector(
-                                                //   onTap: () => connectUser(user),
-                                                //   child: Container(
-                                                //     margin: EdgeInsets.symmetric(horizontal: 8.0),
-                                                //     padding: EdgeInsets.all(8.0),
-                                                //     height: 35,
-                                                //     width: 100,
-                                                //     color: getButtonColor(user.device!.state),
-                                                //     child: Center(
-                                                //       child: Text(
-                                                //         getButtonStateName(user.device!.state),
-                                                //         style: TextStyle(
-                                                //             color: Colors.white,
-                                                //             fontWeight: FontWeight.bold),
-                                                //       ),
-                                                //     ),
-                                                //   ),
-                                                // )
-                                              ],
-
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    }),
-                              ),
                             ],
-                          ),
-                        ),
-                      ],
+                          ) : SizedBox(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -1073,6 +1250,7 @@ class _ProfilePageState extends State<ProfilePage> {
             }
 
           });
+
 
           initUserBle(userList);
 

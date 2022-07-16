@@ -162,8 +162,8 @@ class _HistoryPageState extends State<HistoryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Type', style: TextStyle(color: mColors.lightGray, fontSize: 13),),
-              Text("Date", style: TextStyle(color: mColors.lightGray, fontSize: 13),),
+              Text('Type', style: TextStyle(color: mColors.Gay, fontSize: 13),),
+              Text("Date", style: TextStyle(color: mColors.Gay, fontSize: 13),),
             ],
           ),
           Divider(color: Colors.transparent,height: 15,),
@@ -184,8 +184,8 @@ class _HistoryPageState extends State<HistoryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('To', style: TextStyle(color: mColors.lightGray, fontSize: 13),),
-              Text('From', style: TextStyle(color: mColors.lightGray, fontSize: 13),)
+              Text('To', style: TextStyle(color: mColors.Gay, fontSize: 13),),
+              Text('From', style: TextStyle(color: mColors.Gay, fontSize: 13),)
             ],
 
           ),
@@ -233,7 +233,7 @@ class _HistoryPageState extends State<HistoryPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Tx Hash: ', style: TextStyle(color: mColors.lightGray, fontSize: 13),),
+              Text('Tx Hash: ', style: TextStyle(color: mColors.Gay, fontSize: 13),),
               Material(
                   color: mColors.pubKeyColor,
                   borderRadius: BorderRadius.circular(20),
@@ -260,7 +260,7 @@ class _HistoryPageState extends State<HistoryPage> {
             //mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Amount: ', style: TextStyle(color: mColors.lightGray, fontSize: 13),),
+              Text('Amount: ', style: TextStyle(color: mColors.Gay, fontSize: 13),),
               Text(
                   tx.amount + " " + tx.coinName,
                   style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: isSend?Colors.red:Colors.green,)

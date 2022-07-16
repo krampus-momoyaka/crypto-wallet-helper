@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet_application/NFTHelper.dart';
+import 'package:wallet_application/NFTScreen.dart';
 import 'package:wallet_application/add_network_page.dart';
 import 'package:wallet_application/change_network_dialog.dart';
 import 'package:wallet_application/constants.dart';
@@ -189,7 +190,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
 
   _getNfts() async{
 
-    var list =  await NFT.getTestNFT(mWallet.account);
+    var list =  await NFT.getTestNFT(user.pubKey);
     if(list!=null) {
       setState(() {
         // nfts
@@ -268,45 +269,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
         title: const Text(''),
         actions: instaEnabled? <Widget>[
           instagramButton(),
-          PopupMenuButton<String>(
-            onSelected: (s) {
-              switch (s) {
-                case "Logout":
-                  {
-
-                    break;
-                  }
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return { 'Logout'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
         ] : <Widget>[
-          PopupMenuButton<String>(
-            onSelected: (s) {
-              switch (s) {
-                case "Logout":
-                  {
-
-                    break;
-                  }
-              }
-            },
-            itemBuilder: (BuildContext context) {
-              return { 'Logout'}.map((String choice) {
-                return PopupMenuItem<String>(
-                  value: choice,
-                  child: Text(choice),
-                );
-              }).toList();
-            },
-          ),
         ],
       ),
       body: LayoutBuilder(
@@ -322,573 +285,604 @@ class _UserActivityPageState extends State<UserActivityPage> {
             },
             child: SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.maxHeight,
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    //user info
-                    Container(
-                      margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
-                      padding: EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                          color: mColors.light, borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20))),
-                      child: Material(
-                        color: Colors.transparent,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: <Widget>[
-                            Column(
-                              children: [
-                                Container(
-                                  margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: CircleAvatar(
-                                      radius: 50,
-                                      backgroundColor: user.avatar == "null" ? Colors.primaries[user.name.length] : Colors.white,
+              child: Container(
+                color: mColors.light,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.maxHeight,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      //user info
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                            color: mColors.light, borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(20),
+                            bottomRight: Radius.circular(20))),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: <Widget>[
+                              Column(
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                                    child: CircleAvatar(
+                                        radius: 50,
+                                        backgroundColor: user.avatar == "null" ? Colors.primaries[user.name.length] : Colors.white,
 
-                                      child: user.avatar == "null" ? Text(user.name[0], style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)) :
-                                      ClipOval(
-                                        child: Image.file(File(user.avatar),
-                                          fit: BoxFit.cover,
-                                          width: 150,
-                                          height: 150,
-                                        ),
-                                      )
-                                    // child:
+                                        child: user.avatar == "null" ? Text(user.name[0], style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white)) :
+                                        ClipOval(
+                                          child: Image.file(File(user.avatar),
+                                            fit: BoxFit.cover,
+                                            width: 150,
+                                            height: 150,
+                                          ),
+                                        )
+                                      // child:
 
-                                  ),
-                                ),
-                                Visibility(
-                                  visible: true,
-                                  child: Container(
-                                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                    child: TextButton(
-                                        style: ElevatedButton.styleFrom(
-                                          shape: StadiumBorder(),
-                                          primary: mColors.pubKeyColor,
-                                        ),
-                                        key: const Key('chenge_icon'),
-                                        // style: ElevatedButton.styleFrom(
-                                        //   splashFactory: NoSplash.splashFactory,
-                                        // ),
-                                        onPressed: () async {
-                                          final imageNew = (await ImagePicker()
-                                              .pickImage(source: ImageSource.gallery)
-                                              .whenComplete(() =>
-                                          {
-                                          }));
-                                          if (imageNew != null) {
-                                            setState(() {
-                                              user.avatar = imageNew.path;
-                                              _updateUserDB();
-                                            });
-                                          }
-                                        },
-                                        child: Text("Set New Photo", style: TextStyle(
-                                            fontSize: 12, color: Colors.black)
-                                          ,)
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-
-                            Container(
-                              margin: EdgeInsets.all(8),
-
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Visibility(
-                                      visible: !_userNameVisibility,
-                                      child: Container(
-                                        width: 150,
-                                        margin: const EdgeInsets.fromLTRB(30, 10, 0, 0),
-                                        child: TextField(
-                                          maxLength: 15,
-                                          controller: userNameController,
-                                          style: TextStyle(fontSize: 20,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-
-                                    Container(
-                                      margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
-                                      child: Visibility(
-                                          visible: _userNameVisibility,
-                                          child: Text(user.name, style: TextStyle(fontSize: 22,
-                                              fontWeight: FontWeight.bold),)),
-                                    ),
-
-
-                                    IconButton(
-                                        iconSize: 18,
-                                        //padding: const EdgeInsets.all(3),
-                                        onPressed: () {
-                                          setState(() {
-                                            if (_userNameVisibility) {
-                                              userNameController.text = user.name;
-                                              _editIcom = Icon(Icons.check);
-                                            } else {
-                                              user.name = userNameController.text;
-
-                                              _editIcom = Icon(Icons.mode_edit);
-                                              _updateUserDB();
+                                  Visibility(
+                                    visible: true,
+                                    child: Container(
+                                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                      child: TextButton(
+                                          style: ElevatedButton.styleFrom(
+                                            shape: StadiumBorder(),
+                                            primary: mColors.pubKeyColor,
+                                          ),
+                                          key: const Key('chenge_icon'),
+                                          // style: ElevatedButton.styleFrom(
+                                          //   splashFactory: NoSplash.splashFactory,
+                                          // ),
+                                          onPressed: () async {
+                                            final imageNew = (await ImagePicker()
+                                                .pickImage(source: ImageSource.gallery)
+                                                .whenComplete(() =>
+                                            {
+                                            }));
+                                            if (imageNew != null) {
+                                              setState(() {
+                                                user.avatar = imageNew.path;
+                                                _updateUserDB();
+                                              });
                                             }
-
-                                            _userNameVisibility = !_userNameVisibility;
-                                          });
-                                        },
-                                        icon: _editIcom),
-                                  ]),
-                            ),
-
-                            Container(
-                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children:  <Widget>[
-                                  Material(
-                                    color: mColors.pubKeyColor,
-                                    borderRadius: BorderRadius.circular(20),
-                                    child: InkWell(
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: (){
-                                        //Simple to use, no global configuration
-                                        showToast("public key copied",context:context);
-                                        Clipboard.setData(ClipboardData(text: user.pubKey));
-                                      },
-                                      child: Container(
-                                        width: 200,
-                                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                        padding: const EdgeInsets.all(10),
-                                        decoration: BoxDecoration(color: Colors.transparent),
-                                        child:
-                                        Text(
-                                            user.pubKey,
-                                            overflow: TextOverflow.ellipsis
-                                        ),
+                                          },
+                                          child: Text("Set New Photo", style: TextStyle(
+                                              fontSize: 12, color: Colors.black)
+                                            ,)
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
-                            ),
-                          ],
+
+                              Container(
+                                margin: EdgeInsets.all(8),
+
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Visibility(
+                                        visible: !_userNameVisibility,
+                                        child: Container(
+                                          width: 150,
+                                          margin: const EdgeInsets.fromLTRB(30, 10, 0, 0),
+                                          child: TextField(
+                                            maxLength: 15,
+                                            controller: userNameController,
+                                            style: TextStyle(fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+
+                                      Container(
+                                        margin: EdgeInsets.fromLTRB(25, 0, 0, 0),
+                                        child: Visibility(
+                                            visible: _userNameVisibility,
+                                            child: Text(user.name, style: TextStyle(fontSize: 22,
+                                                fontWeight: FontWeight.bold),)),
+                                      ),
+
+
+                                      IconButton(
+                                          iconSize: 18,
+                                          //padding: const EdgeInsets.all(3),
+                                          onPressed: () {
+                                            setState(() {
+                                              if (_userNameVisibility) {
+                                                userNameController.text = user.name;
+                                                _editIcom = Icon(Icons.check);
+                                              } else {
+                                                user.name = userNameController.text;
+
+                                                _editIcom = Icon(Icons.mode_edit);
+                                                _updateUserDB();
+                                              }
+
+                                              _userNameVisibility = !_userNameVisibility;
+                                            });
+                                          },
+                                          icon: _editIcom),
+                                    ]),
+                              ),
+
+                              Container(
+                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 15),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children:  <Widget>[
+                                    Material(
+                                      color: mColors.pubKeyColor,
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: InkWell(
+                                        borderRadius: BorderRadius.circular(20),
+                                        onTap: (){
+                                          //Simple to use, no global configuration
+                                          showToast("public key copied",context:context);
+                                          Clipboard.setData(ClipboardData(text: user.pubKey));
+                                        },
+                                        child: Container(
+                                          width: 200,
+                                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                          padding: const EdgeInsets.all(10),
+                                          decoration: BoxDecoration(color: Colors.transparent),
+                                          child:
+                                          Text(
+                                              user.pubKey,
+                                              overflow: TextOverflow.ellipsis
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Container(
-                            margin: EdgeInsets.all(8),
-                            decoration: BoxDecoration(color: Colors.transparent),
-                            child: TextButton(
-                                onPressed: (){
-                                  if(btn_add_contact == "Add to Contacts"){
-                                    _addUserToContacts();
-                                  }else{
-                                    _removeUserFromContacts();
-                                  }
-                                },
-                                style: ButtonStyle(
-                                    padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(16)),
-                                    backgroundColor: MaterialStateProperty.all<Color>(mColors.light),
-                                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20),
-                                          side: BorderSide(color: Colors.transparent),
-
-                                        )
-                                    )
-                                ),
-                                child: Text(btn_add_contact, style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold))),
-
-                          ),
-                        ),
-
-                      ],
-                    ),
-
-
-                    Container(
-                      padding: EdgeInsets.fromLTRB(12, 24, 12, 12),
-                      margin: EdgeInsets.fromLTRB(8, 10, 8, 10),
-                      decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
-
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Container(
-                            margin: const EdgeInsets.fromLTRB(15, 0, 15, 10),
-                            child: Text("Transaction via ${mWallet.provider?.connector.session.peerMeta?.name.toString()}",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
-                          ),
-                          Divider(
-                            height: 10,
-                          ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
-                            child: Text("Your wallet",style: TextStyle(backgroundColor: Colors.transparent, fontSize: 15)
+                          Expanded(
+                            child: Container(
+                              margin: EdgeInsets.all(8),
+                              decoration: BoxDecoration(color: Colors.transparent),
+                              child: TextButton(
+                                  onPressed: (){
+                                    if(btn_add_contact == "Add to Contacts"){
+                                      _addUserToContacts();
+                                    }else{
+                                      _removeUserFromContacts();
+                                    }
+                                  },
+                                  style: ButtonStyle(
+                                      padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.all(16)),
+                                      backgroundColor: MaterialStateProperty.all<Color>(mColors.walletColor),
+                                      overlayColor: MaterialStateProperty.all<Color>(mColors.shadowGray),
+                                      elevation: MaterialStateProperty.all<double>(2.0),
+                                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                          RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
+                                            side: BorderSide(color: Colors.transparent),
+
+                                          )
+                                      )
+                                  ),
+                                  child: Text(btn_add_contact, style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold, color: mColors.white))),
+
                             ),
                           ),
-                          Divider(
-                            height: 1,
-                            color: Colors.transparent,
-                          ),
-                          Container(
-                            margin: EdgeInsets.fromLTRB(8,4,8,8),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children:  <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(20, 5, 27, 5),
-                                      child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Flexible(
-                                      child: Container(
-                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                        child: Material(
-                                          color:  mColors.pubKeyColor,
-                                          borderRadius: BorderRadius.circular(20),
-                                          child: InkWell(
+
+                        ],
+                      ),
+
+
+                      Container(
+                        padding: EdgeInsets.fromLTRB(12, 24, 12, 12),
+                        margin: EdgeInsets.fromLTRB(8, 10, 8, 10),
+                        decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.fromLTRB(15, 0, 15, 10),
+                              child: Text("Transaction via ${mWallet.provider?.connector.session.peerMeta?.name.toString()}",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
+                            ),
+                            Divider(
+                              height: 10,
+                            ),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
+                              child: Text("Your wallet",style: TextStyle(backgroundColor: Colors.transparent, fontSize: 15)
+                              ),
+                            ),
+                            Divider(
+                              height: 1,
+                              color: Colors.transparent,
+                            ),
+                            Container(
+                              margin: EdgeInsets.fromLTRB(8,4,8,8),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children:  <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(20, 5, 27, 5),
+                                        child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
+                                      ),
+                                      Flexible(
+                                        child: Container(
+                                          margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                          child: Material(
+                                            color:  mColors.pubKeyColor,
                                             borderRadius: BorderRadius.circular(20),
-                                            onTap: () async {
-                                              mWallet.updateCallback = (){
-                                                setState(() {
-                                                  if(mWallet.currentNet == mNetworks.unknownNet){
-                                                    sendEnabled = false;
-                                                    receiveEnabled = true;
-                                                  }else {
-                                                    sendEnabled = true;
-
-                                                    if(userFcmToken!=''){
+                                            child: InkWell(
+                                              borderRadius: BorderRadius.circular(20),
+                                              onTap: () async {
+                                                mWallet.updateCallback = (){
+                                                  setState(() {
+                                                    if(mWallet.currentNet == mNetworks.unknownNet){
+                                                      sendEnabled = false;
                                                       receiveEnabled = true;
+                                                    }else {
+                                                      sendEnabled = true;
+
+                                                      if(userFcmToken!=''){
+                                                        receiveEnabled = true;
+                                                      }
                                                     }
-                                                  }
-                                                });
-                                              };
-                                              AlertDialog ad = await buildNetworkDialog(context);
-                                              showDialog(context: context, builder: (context){
-                                                return ad;
-                                              }).then((net) async {
-                                                 final tx = await mWallet.changeNetwork(net);
-                                                 print("Switch Chain TX: "+tx.toString());
-                                                 if(tx is int){
-                                                   showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
-
-                                                 }
-                                                 if (tx.toString() !=
-                                                     'JSON-RPC error -32000: User rejected the request.') {
-                                                   if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
-                                                       requestAddChain(net);
-                                                   } else {
-
+                                                  });
+                                                };
+                                                AlertDialog ad = await buildNetworkDialog(context);
+                                                showDialog(context: context, builder: (context){
+                                                  return ad;
+                                                }).then((net) async {
+                                                   final tx = await mWallet.changeNetwork(net);
+                                                   print("Switch Chain TX: "+tx.toString());
+                                                   if(tx is int){
+                                                     showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
 
                                                    }
-                                                 }
-                                                 else {
-                                                   showToast('Request rejected',
-                                                       context: context,
-                                                       duration: Duration(
-                                                           seconds: 5));
-                                                 }
+                                                   if (tx.toString() !=
+                                                       'JSON-RPC error -32000: User rejected the request.') {
+                                                     if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
+                                                         requestAddChain(net);
+                                                     } else {
 
-                                              });
-                                            },
-                                            child: Container(
-                                              margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(color: Colors.transparent),
-                                              child:
-                                              Text(
-                                                  mWallet.currentNet.name,
-                                                  overflow: TextOverflow.ellipsis
+
+                                                     }
+                                                   }
+                                                   else {
+                                                     showToast('Request rejected',
+                                                         context: context,
+                                                         duration: Duration(
+                                                             seconds: 5));
+                                                   }
+
+                                                });
+                                              },
+                                              child: Container(
+                                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                                                padding: const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(color: Colors.transparent),
+                                                child:
+                                                Text(
+                                                    mWallet.currentNet.name,
+                                                    overflow: TextOverflow.ellipsis
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Row(
-                                  children:  <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(20, 8, 27, 15),
-                                      child: Text("Balance:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Container(
-                                        margin: const EdgeInsets.fromLTRB(0, 0, 0, 5),
-                                        padding: const EdgeInsets.all(10),
-                                        //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
-                                        child:
-                                        Text(mWallet.balance.getValueInUnit(EtherUnit.ether).toString() + " ${mWallet.currentNet.coinName}")
-
-                                    )
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          Divider(
-                            height: 10,
-                          ),
-
-                          Container(
-                            margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
-                            child: Text("Send transaction",style: TextStyle(backgroundColor: Colors.transparent,fontSize: 15)
-                            ),
-                          ),
-
-                          Divider(
-                            height: 1,
-                            color: Colors.transparent,
-                          ),
-
-
-
-                          Container(
-                            margin: EdgeInsets.fromLTRB(8,8,8,8),
-                            padding: EdgeInsets.fromLTRB(4,10,10,4),
-
-                            child: Column(
-                              children: [
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children:  <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(20, 25, 27, 5),
-                                      child: Text("Amount:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                    ),
-                                    Container(
-                                      width: 150,
-                                      margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                      child: Material(
-                                        color:  Colors.transparent,
-                                        borderRadius: BorderRadius.circular(20),
-                                        child: TextFormField(
-                                          initialValue: initialAmount,
-                                          autovalidateMode: AutovalidateMode.always,
-                                          keyboardType:  TextInputType.number,
-                                          textInputAction: TextInputAction.done,
-                                          inputFormatters: <TextInputFormatter>[
-                                            FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
-                                          ],
-                                          decoration: InputDecoration(
-                                            filled: true,
-                                            fillColor: mColors.pubKeyColor,
-                                              border: OutlineInputBorder(
-                                                gapPadding: 0,
-                                                borderRadius: BorderRadius.circular(10)
-                                              ),
-                                          ),
-                                          validator: (value){
-                                            if(value!=null) {
-                                              final newAmount = double.tryParse(value);
-                                              if(newAmount!=null) {
-                                                amount = newAmount;
-                                              }else{
-                                                amount = -1;
-                                              }
-
-                                            }
-
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(10, 25, 0, 5),
-                                      child: Text(mWallet.currentNet.coinName,style: TextStyle(fontWeight: FontWeight.bold),),
-                                    )
-                                  ],
-                                ),
-
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children:  <Widget>[
-                                    Container(
-                                      margin: const EdgeInsets.fromLTRB(0, 20, 40, 0),
-                                      padding: const EdgeInsets.all(5),
-                                      child: ElevatedButton(
-                                        onPressed: receiveEnabled ? (){
-                                          if(amount>0) {
-                                            requestTransaction();
-                                          } else {
-                                            showToast("Invalid amount", context: context);
-                                          }
-
-                                        }:(){
-
-                                        },
-
-                                        style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
-                                          borderRadius: new BorderRadius.circular(30.0),
-
-                                          ),
-                                          primary: receiveEnabled? null : Colors.blueGrey
-                                        ),
-                                        child: receiveEnabled? Text("Receive"): Text("Not allowed"),
-                                      ),
-                                    ),
-                                    Container(
-                                        margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                        padding: const EdgeInsets.all(5),
-                                        //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
-                                        child: ElevatedButton(
-                                          onPressed: sendEnabled? () async{
-
-                                            if(amount<mWallet.balance.getValueInUnit(EtherUnit.ether)&& amount>0) {
-                                              mWallet.updateCallback = (){
-                                                setState(() {
-                                                  if(mWallet.currentNet == mNetworks.unknownNet){
-                                                    sendEnabled = false;
-                                                    receiveEnabled = true;
-                                                  }else {
-                                                    sendEnabled = true;
-
-                                                    if(userFcmToken!=''){
-                                                      receiveEnabled = true;
-                                                    }
-                                                  }
-                                                });
-                                              };
-                                              final tx = await mWallet
-                                                  .sendPayment(
-                                                  amount, user.pubKey);
-
-                                              if (tx.isNotEmpty) {
-                                                if(tx == "JSON-RPC error -32000: User rejected the transaction") {
-                                                  showToast("Transaction rejected", context: context, duration: Duration(seconds: 5));
-                                                }else{
-
-                                                  showToast("Transaction sent", context: context, duration: Duration(seconds: 5));
-
-
-                                                  notifyReceiver(tx);
-
-                                                }
-                                                await mWallet.updateBalance();
-
-                                                setState(() {
-
-                                                });
-
-                                              }
-                                            }else{
-                                              showToast("Invalid amount", context: context);
-                                            }
-                                          }:(){
-                                            showToast("Please setup network first", context: context);
-                                          },
-                                          style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
-                                              borderRadius: new BorderRadius.circular(30.0),
-                                              ),
-                                              primary: sendEnabled? null : Colors.blueGrey
-                                          ),
-                                          child: sendEnabled? Text("Send"): Text("Not allowed"),
-                                        ),
-                                    )
-                                  ],
-                                ),
-
-                              ],
-                            ),
-                          ),
-
-                        ],
-                      ),
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Container(
-                            margin: EdgeInsets.fromLTRB(16, 24, 0, 0),
-                            child: Text("OpenSea Gallery",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: mColors.lightGray))
-                        ),
-                      ],
-                    ),
-
-                    Container(
-                      padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
-                      margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
-                      decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-
-                          GridView.builder(
-                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                                  crossAxisCount: 2,
-                                  childAspectRatio: (itemWidth / itemHeight),
-                                  crossAxisSpacing: 0,
-                                  mainAxisSpacing: 0),
-                              itemCount: nfts.length,
-                              shrinkWrap: true,
-                              physics: NeverScrollableScrollPhysics(),
-                              itemBuilder: (BuildContext ctx, index) {
-                                return Container(
-                                  margin: EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    //Here goes the same radius, u can put into a var or function
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: mColors.shadowGray,
-                                        spreadRadius:0,
-                                        blurRadius: 1,
-                                        offset: Offset(0.0, 2.0)
-                                      ),
+                                      )
                                     ],
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
+                                  Row(
+                                    children:  <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(20, 8, 27, 15),
+                                        child: Text("Balance:",style: TextStyle(fontWeight: FontWeight.bold),),
+                                      ),
+                                      Container(
+                                          margin: const EdgeInsets.fromLTRB(0, 0, 0, 5),
+                                          padding: const EdgeInsets.all(10),
+                                          //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
+                                          child:
+                                          Text(mWallet.balance.getValueInUnit(EtherUnit.ether).toString() + " ${mWallet.currentNet.coinName}")
 
-                                      //margin: EdgeInsets.only(bottom: 10),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Center(child: Image.network(nfts[index].imageUrl, height:itemWidth-20, fit: BoxFit.contain,)),
-                                          Container(
-                                            child: Text(nfts[index].name,
-                                              style: TextStyle(), textAlign: TextAlign.start, maxLines: 1, overflow: TextOverflow.ellipsis,),
-                                            margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
-                                            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                                          )
-                                        ],
-                                      ),
-                                      decoration: BoxDecoration(
-                                      //  borderRadius: BorderRadius.circular(10),
-                                        color: nfts[index].backgroundColor == null ? mColors.white: nfts[index].backgroundColor,
-                                        // boxShadow: [ BoxShadow(
-                                        //   color: Colors.grey,
-                                        //   offset: Offset(3.0, 3.0), //(x,y)
-                                        //   blurRadius: 3.0,
-                                        //   )
-                                        // ],
-                                      ),
-                                    ),
+                                      )
+                                    ],
                                   ),
-                                );
-                              }),
-                        ],
+                                ],
+                              ),
+                            ),
+
+                            Divider(
+                              height: 10,
+                            ),
+
+                            Container(
+                              margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
+                              child: Text("Send transaction",style: TextStyle(backgroundColor: Colors.transparent,fontSize: 15)
+                              ),
+                            ),
+
+                            Divider(
+                              height: 1,
+                              color: Colors.transparent,
+                            ),
+
+
+
+                            Container(
+                              margin: EdgeInsets.fromLTRB(8,8,8,8),
+                              padding: EdgeInsets.fromLTRB(4,10,10,4),
+
+                              child: Column(
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children:  <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(20, 25, 27, 5),
+                                        child: Text("Amount:",style: TextStyle(fontWeight: FontWeight.bold),),
+                                      ),
+                                      Container(
+                                        width: 150,
+                                        margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                                        child: Material(
+                                          color:  Colors.transparent,
+                                          borderRadius: BorderRadius.circular(20),
+                                          child: TextFormField(
+                                            initialValue: initialAmount,
+                                            autovalidateMode: AutovalidateMode.always,
+                                            keyboardType:  TextInputType.number,
+                                            textInputAction: TextInputAction.done,
+                                            inputFormatters: <TextInputFormatter>[
+                                              FilteringTextInputFormatter.allow(RegExp(r'[0-9,.]')),
+                                            ],
+                                            decoration: InputDecoration(
+                                              filled: true,
+                                              fillColor: mColors.pubKeyColor,
+                                                border: OutlineInputBorder(
+                                                  gapPadding: 0,
+                                                  borderRadius: BorderRadius.circular(10)
+                                                ),
+                                            ),
+                                            validator: (value){
+                                              if(value!=null) {
+                                                final newAmount = double.tryParse(value);
+                                                if(newAmount!=null) {
+                                                  amount = newAmount;
+                                                }else{
+                                                  amount = -1;
+                                                }
+
+                                              }
+
+                                            },
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(10, 25, 0, 5),
+                                        child: Text(mWallet.currentNet.coinName,style: TextStyle(fontWeight: FontWeight.bold),),
+                                      )
+                                    ],
+                                  ),
+
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children:  <Widget>[
+                                      Container(
+                                        margin: const EdgeInsets.fromLTRB(0, 20, 40, 0),
+                                        padding: const EdgeInsets.all(5),
+                                        child: ElevatedButton(
+                                          onPressed: receiveEnabled ? (){
+                                            if(amount>0) {
+                                              requestTransaction();
+                                            } else {
+                                              showToast("Invalid amount", context: context);
+                                            }
+
+                                          }:(){
+
+                                          },
+
+                                          style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
+                                            borderRadius: new BorderRadius.circular(30.0),
+
+                                            ),
+                                            primary: receiveEnabled? null : Colors.blueGrey
+                                          ),
+                                          child: receiveEnabled? Text("Receive"): Text("Not allowed"),
+                                        ),
+                                      ),
+                                      Container(
+                                          margin: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                                          padding: const EdgeInsets.all(5),
+                                          //decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),color: Colors.tealAccent),
+                                          child: ElevatedButton(
+                                            onPressed: sendEnabled? () async{
+
+                                              if(amount<mWallet.balance.getValueInUnit(EtherUnit.ether)&& amount>0) {
+                                                mWallet.updateCallback = (){
+                                                  setState(() {
+                                                    if(mWallet.currentNet == mNetworks.unknownNet){
+                                                      sendEnabled = false;
+                                                      receiveEnabled = true;
+                                                    }else {
+                                                      sendEnabled = true;
+
+                                                      if(userFcmToken!=''){
+                                                        receiveEnabled = true;
+                                                      }
+                                                    }
+                                                  });
+                                                };
+                                                final tx = await mWallet
+                                                    .sendPayment(
+                                                    amount, user.pubKey);
+
+                                                if (tx.isNotEmpty) {
+                                                  if(tx == "JSON-RPC error -32000: User rejected the transaction") {
+                                                    showToast("Transaction rejected", context: context, duration: Duration(seconds: 5));
+                                                  }else{
+
+                                                    showToast("Transaction sent", context: context, duration: Duration(seconds: 5));
+
+
+                                                    notifyReceiver(tx);
+
+                                                  }
+                                                  await mWallet.updateBalance();
+
+                                                  setState(() {
+
+
+                                                  });
+
+                                                }
+                                              }else{
+                                                showToast("Invalid amount", context: context);
+                                              }
+                                            }:(){
+                                              showToast("Please setup network first", context: context);
+                                            },
+                                            style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
+                                                borderRadius: new BorderRadius.circular(30.0),
+                                                ),
+                                                primary: sendEnabled? null : Colors.blueGrey
+                                            ),
+                                            child: sendEnabled? Text("Send"): Text("Not allowed"),
+                                          ),
+                                      )
+                                    ],
+                                  ),
+
+                                ],
+                              ),
+                            ),
+
+                          ],
+                        ),
                       ),
-                    )
-                  ],
+
+
+                      nfts.isNotEmpty ? Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.fromLTRB(16, 24, 0, 0),
+                                  child: Text("OpenSea Gallery",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: mColors.Gay))
+                              ),
+                            ],
+                          ),
+
+                          Container(
+                            padding: EdgeInsets.fromLTRB(8, 12, 8, 12),
+                            margin: EdgeInsets.fromLTRB(0, 10, 0, 10),
+                            decoration: BoxDecoration(color: mColors.light,borderRadius: BorderRadius.circular(20),),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                GridView.builder(
+                                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2,
+                                        childAspectRatio: (itemWidth / itemHeight),
+                                        crossAxisSpacing: 0,
+                                        mainAxisSpacing: 0),
+                                    itemCount: nfts.length,
+                                    shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
+                                    itemBuilder: (BuildContext ctx, index) {
+                                      return Material(
+                                        type: MaterialType.transparency,
+                                        child: Container(
+                                          margin: EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            //Here goes the same radius, u can put into a var or function
+                                            borderRadius:
+                                            BorderRadius.circular(10),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                  color: mColors.shadowGray,
+                                                  spreadRadius:0.8,
+                                                  blurRadius: 1.3,
+                                                  offset: Offset(0.0, 1.0)
+                                              ),
+                                            ],
+                                          ),
+                                          child: ClipRRect(
+                                            borderRadius: BorderRadius.circular(10),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                              //  borderRadius: BorderRadius.circular(10),
+                                                color: nfts[index].backgroundColor == null ? mColors.white: nfts[index].backgroundColor,
+                                                // boxShadow: [ BoxShadow(
+                                                //   color: Colors.grey,
+                                                //   offset: Offset(3.0, 3.0), //(x,y)
+                                                //   blurRadius: 3.0,
+                                                //   )
+                                                // ],
+                                              ),
+                                              child: Material(
+                                                type: MaterialType.transparency,
+                                                child: InkWell(
+                                                  splashColor: mColors.Gay,
+                                                  onTap: (){
+                                                    Navigator.push(context, MaterialPageRoute(builder: (context){
+                                                      return NFTScreen(nft: nfts[index]);
+                                                    }));
+                                                  },
+                                                  child: Ink(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Center(
+                                                            child: Image.network(
+                                                              nfts[index].imageUrl,
+                                                              height:itemWidth-20,
+                                                              fit: BoxFit.contain,
+                                                            )
+                                                        ),
+                                                        Container(
+                                                          child: Text(nfts[index].name,
+                                                            style: TextStyle(), textAlign: TextAlign.start, maxLines: 1, overflow: TextOverflow.ellipsis,),
+                                                          margin: EdgeInsets.fromLTRB(0, 8, 0, 0),
+                                                          padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                                                        )
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ) : SizedBox(),
+                    ],
+                  ),
                 ),
               ),
             ),

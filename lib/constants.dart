@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:wallet_application/connector.dart';
 import 'package:wallet_application/network.dart';
 
 const sMainTitle = "WalletConnect";
 
 mixin mColors {
 
-  static const lightGray = Color(0xFFa0aec1);
+  static const Gay = Color(0xFFa0aec1);
   static const white = Color(0xFFFFFFFF);
   static const walletColor = Color(0xFF3B99FC);
   static const pubKeyColor = Color(0xFFE6F1FB);
-  static const light = Color(0xFFf0f0ef);
-  static const appBarColor = MaterialColor(0xFFf0f0ef, <int, Color>{0: Color(0xFFf0f0ef)});
+  static const light = Color(0xFFFBFDFF);
+  static const appBarColor = MaterialColor(0xFFFBFDFF, <int, Color>{0: Color(0xFFFBFDFF)});
   static const gold = Color(0xFFffd700);
   static const shadowGray = Color(0x30000000);
+  static const waterBlue = Color(0x6A62C5E3);
+  static const  lightGay = Color(0xffE5E8EB);
+  static const dark = Color(0xFF1A1A1A);
+  static const Natural = Color(0xFF7B7D83);
+  static const deepPurple = Color(0xFF0C185E);
+
+
 }
 
 mixin mNetworks  {
