@@ -7,6 +7,27 @@ import 'package:wallet_application/User.dart';
 
 class NFT {
 
+  static Future<Asset?> getTestSingleNFT(String tokenID, String contractAddress, {String owner = ''}) async {
+    var url = "https://testnets-api.opensea.io/api/v1/asset/${contractAddress}/${tokenID}/";
+
+    if(owner!='') url+='?account_address=$owner';
+
+    final response= await http.get(Uri.parse(url));
+
+    if(response.statusCode == 200){
+
+      final j = json.decode(response.body);
+
+      Asset asset = Asset(j);
+
+      print(asset);
+
+      return asset;
+    }
+
+    return null;
+  }
+
   static Future<List<Asset>?> getTestNFT(String address) async {
     final url = "https://testnets-api.opensea.io/api/v1/assets?owner=$address";
 
@@ -38,7 +59,7 @@ class Asset{
   var backgroundColor;
   String imageUrl = '';
   String name = '';
-  int tokenId = 1;
+  String tokenId = '1';
   String schema = '';
   String description = '';
   String? collectionDescription = '';
@@ -65,7 +86,7 @@ class Asset{
     }
     imageUrl = json['image_url'];
     name = json['name'];
-    tokenId = json['id'];
+    tokenId = json['token_id'];
     description = json['description'] ?? "";
     schema =  json['asset_contract']['schema_name'];
     contractAddress = json['asset_contract']['address'];

@@ -50,6 +50,9 @@ void _onMessageOpenedApp(RemoteMessage message) async {
   if(data['message']=='Transaction request') {
     navigatorKey.currentState?.pushNamed('/UserActivity',arguments: {'user': User(data['name'],data['pubKey']),'message': message.data});
   }
+  if(data['message']=="NFT request"){
+    navigatorKey.currentState?.pushNamed('/SendNFTPage',arguments: {'user': User(data['name'],data['pubKey']),'message': message.data});
+  }
 
 
 
@@ -134,20 +137,40 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
   print("Handling a background message: ${message.messageId}");
 
-  if(message.data['message']=='You received Transaction'){
-    print('terminate message data:' + jsonEncode(message.data));
+  switch(message.data['message']){
+    case 'You received Transaction' : {
+      print('terminate message data:' + jsonEncode(message.data));
 
 
-    isDefaultLaunch = true;
-    mWallet.writeTransactionToHistory(
-      direction: 'income',
-      from:message.data['pubKey'] ,
-      me:message.data['to'] ,
-      net: message.data['net'],
-      coinName:message.data['currency'],
-      amount: message.data['amount'],
-      txHash: message.data['tx'],
-    );
+      isDefaultLaunch = true;
+      mWallet.writeTransactionToHistory(
+        direction: 'income',
+        from:message.data['pubKey'] ,
+        me:message.data['to'] ,
+        net: message.data['net'],
+        coinName:message.data['currency'],
+        amount: message.data['amount'],
+        txHash: message.data['tx'],
+      );
+      break;
+    }
+    case 'You received NFT': {
+      print('terminate message data:' + jsonEncode(message.data));
+
+
+      isDefaultLaunch = true;
+      mWallet.writeTransactionToHistory(
+        direction: 'income',
+        from:message.data['pubKey'] ,
+        me:message.data['to'] ,
+        net: message.data['net'],
+        nftName:message.data['token_name'],
+        nftId: message.data['token_id'],
+        nftContract: message.data['contract_id'],
+        txHash: message.data['tx'],
+      );
+      break;
+    }
   }
 
 
@@ -289,12 +312,12 @@ class _ProfilePageState extends State<ProfilePage> {
       initBluetooth();
     });
 
-    users.add(User('vlados','0x4158615616156165156156'));
-    users.add(User('vlados','0x4158615616156165156156'));
-    users.add(User('vlados','0x4158615616156165156156'));
-    users.add(User('vlados','0x4158615616156165156156'));
-    users.add(User('vlados','0x4158615616156165156156'));
-    users.add(User('vlados','0x4158615616156165156156'));
+    // users.add(User('vlad','0x4158615616156165156156'));
+    // users.add(User('vlad','0x4158615616156165156156'));
+    // users.add(User('vlad','0x4158615616156165156156'));
+    // users.add(User('vlad','0x4158615616156165156156'));
+    // users.add(User('vlads','0x4158615616156165156156'));
+    // users.add(User('vlads','0x4158615616156165156156'));
     _getNfts();
 
   }
@@ -468,8 +491,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
     var size = MediaQuery.of(context).size;
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 2.9;
     final double itemWidth = size.width / 2;
+    final double aspect = 0.8;
 
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -765,7 +788,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
 
-                                            //showToast(FirebaseHelper.notificationData,context: context);
+                                            showToast(FirebaseHelper.notificationData,context: context);
                                             Clipboard.setData(ClipboardData(text: mWallet.account));
                                           },
                                           child: Container(
@@ -998,7 +1021,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     GridView.builder(
                                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                             crossAxisCount: 2,
-                                            childAspectRatio: (itemWidth / itemHeight),
+                                            childAspectRatio: (aspect),
                                             crossAxisSpacing: 0,
                                             mainAxisSpacing: 0),
                                         itemCount: nfts.length,

@@ -10,6 +10,7 @@ import 'package:sqflite/sqflite.dart' as s;
 import 'package:sqflite/utils/utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+import 'package:wallet_application/NFTHelper.dart';
 import 'package:wallet_application/connector.dart';
 import 'package:wallet_application/constants.dart';
 import 'package:wallet_application/dbHelper.dart';
@@ -474,7 +475,7 @@ import 'network.dart';
   }
 
 
-  static Future<String> sendRaw() async {
+  static Future<String> sendNFT(Asset nft, String to) async {
     String uri = connector.session.toUri();
     uri = 'metamask://' + uri;
 
@@ -487,66 +488,53 @@ import 'network.dart';
 
 
 
-    try {
+    if(nft.schema == "ERC1155") {
+      try {
+        final String erc1155 = await rootBundle.loadString(
+            'assets/abi/erc1155abi.json');
 
-      final String erc1155 = await rootBundle.loadString('assets/abi/erc1155abi.json');
+        final abi = DeployedContract(ContractAbi.fromJson(erc1155, 'ERC1155'),
+            EthereumAddress.fromHex(
+                '0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656'));
 
-      final abi = DeployedContract(ContractAbi.fromJson(erc1155, 'ERC1155'),EthereumAddress.fromHex('0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656'));
+        final transfer = abi.function('safeTransferFrom');
 
-      final transfer = abi.function('safeTransferFrom');
+        final approval = abi.function('setApprovalForAll');
 
-      final approval = abi.function('setApprovalForAll');
+        final cred = WalletConnectEthereumCredentials(provider: provider!);
 
-      //connector.sendCustomRequest(method: 'safeTransferFrom', params: []);
+        final trans = Transaction.callContract(
+            contract: abi, function: transfer, parameters: [
+          EthereumAddress.fromHex(account),
+          EthereumAddress.fromHex(to),
+          BigInt.parse(
+              nft.tokenId),
+          BigInt.one,
+          Uint8List.fromList([])
+        ],
+            maxGas: 100000
 
-      final cred = WalletConnectEthereumCredentials(provider: provider!);
+        );
 
-
-      EthPrivateKey? credentials = await client!.credentialsFromPrivateKey('0x2902121864e7ba8a0372fa5b6fd3f13712cbbb003c4098432be82b4e49e9f277');
-
-
-      final trans = Transaction.callContract(contract: abi, function: transfer, parameters:[
-        EthereumAddress.fromHex('0x9c4300343C501A9cF6Fe2d5c1A5197a6dF7D2Bf9'),
-        EthereumAddress.fromHex('0x65EB1b6A3Ab979B45e55Ffc560ccD8E072839fb3'),
-        BigInt.parse('43423942902319331396749475977823357118326845546372406946901311255413360951297'),
-        BigInt.one,
-        Uint8List.fromList([])
-      ],
-          maxGas: 100000
-
-      );
-
-      final hash = await provider!.sendTransaction(
-        from: account,
-        to: trans.to?.hex,
-        data: trans.data,
-        gas: trans.maxGas,
-        gasPrice: trans.gasPrice?.getInWei,
-        value: trans.value?.getInWei,
-        nonce: trans.nonce,
-      );
-
-
-      // final txx = await client?.call(contract: abi, function: transfer, params:[
-      //   EthereumAddress.fromHex('0x65EB1b6A3Ab979B45e55Ffc560ccD8E072839fb3'),
-      //   EthereumAddress.fromHex('0x9c4300343C501A9cF6Fe2d5c1A5197a6dF7D2Bf9'),
-      //   BigInt.parse('43423942902319331396749475977823357118326845546372406946901311255413360951297'),
-      //   BigInt.one,
-      //   Uint8List.fromList([])
-      // ],
-      //     sender: await credentials.extractAddress()
-      // );
-      final txHash = '';
+        final txHash = await provider!.sendTransaction(
+          from: account,
+          to: trans.to?.hex,
+          data: trans.data,
+          gas: trans.maxGas,
+          gasPrice: trans.gasPrice?.getInWei,
+          value: trans.value?.getInWei,
+          nonce: trans.nonce,
+        );
 
 
-
-
-
-      print(txHash);
-      return txHash.toString();
-    }catch(e){
-      print(e);
-      return e.toString();
+        print(txHash);
+        return txHash.toString();
+      } catch (e) {
+        print(e);
+        return e.toString();
+      }
+    }else{
+      return "Not valid schema (${nft.schema})";
     }
 
   }
@@ -600,7 +588,20 @@ import 'network.dart';
     updateCallback.call();
   }
 
-  static void writeTransactionToHistory({required String direction, required String from, required String me, required String net,required String amount, String coinName = 'ETH', String txHash = ''}) {
+  static void writeTransactionToHistory(
+      {
+        required String direction,
+        required String from,
+        required String me,
+        required String net,
+        String amount = '0',
+        String coinName = 'ETH',
+        String txHash = '',
+        String nftName = '',
+        String nftId = '',
+        String nftContract = '',
+      }
+      ) {
     final dbh = DbHelper();
     dbh.openDB().then((s.Database db) async{
       if(db.isOpen){
@@ -612,6 +613,9 @@ import 'network.dart';
           'net_name':net,
           'coin_name':coinName,
           'date':DateFormat('MMM dd kk:mm').format(DateTime.now()),
+          'nft_name': nftName,
+          'nft_id': nftId,
+          'nft_contract_id': nftContract,
           'tx_hash':txHash
         });
 

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:drop_cap_text/drop_cap_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -5,16 +7,28 @@ import 'package:flutter/services.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet_application/Animations/fade_animation.dart';
 import 'package:wallet_application/NFTHelper.dart';
+import 'package:wallet_application/SendNFTPage.dart';
 import 'package:wallet_application/constants.dart';
+import 'package:wallet_application/server.dart';
+import 'package:wallet_application/wallet.dart';
 import 'package:web3dart/web3dart.dart';
+import 'package:http/http.dart' as http;
+
+import 'User.dart';
+import 'dbHelper.dart';
+import 'firebaseHelper.dart';
 
 class NFTScreen extends StatelessWidget {
-  NFTScreen({Key? key, required this.nft}) : super(key: key);
+
+
+  NFTScreen({Key? key, required this.nft, this.owner}) : super(key: key);
 
   final Asset nft;
+  User? owner;
 
 
 
@@ -27,7 +41,7 @@ class NFTScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    return NFTPage(nft: nft);
+    return NFTPage(nft: nft, owner: owner);
   }
 
 
@@ -35,9 +49,12 @@ class NFTScreen extends StatelessWidget {
 }
 
 class NFTPage extends StatefulWidget{
-  const NFTPage({Key? key, required this.nft}) : super(key: key);
+
+
+  NFTPage({Key? key, required this.nft, this.owner}) : super(key: key);
 
   final Asset nft;
+  User? owner;
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -56,7 +73,10 @@ class NFTPage extends StatefulWidget{
 class _NFTPageState extends State<NFTPage> {
 
 
+
+
   late Asset nft;
+  User? owner;
 
   List<bool> descriptionIsOpen = [false, false, false];
 
@@ -64,6 +84,7 @@ class _NFTPageState extends State<NFTPage> {
   void initState() {
 
     nft = widget.nft;
+    owner = widget.owner;
     super.initState();
   }
 
@@ -105,15 +126,17 @@ class _NFTPageState extends State<NFTPage> {
             ),
             const SizedBox(height: 30),
 
-            Container(
-              margin: EdgeInsets.only(top: 0),
-              child: Stack(
-                children: [
-                  Hero(
-                    tag: nft.imageUrl,
-                    child: Image.network(nft.imageUrl),
-                  ),
-                ],
+            Center(
+              child: Container(
+                margin: EdgeInsets.only(top: 0),
+                child: Stack(
+                  children: [
+                    Hero(
+                      tag: nft.imageUrl,
+                      child: Image.network(nft.imageUrl),
+                    ),
+                  ],
+                ),
               ),
             ),
 
@@ -195,17 +218,46 @@ class _NFTPageState extends State<NFTPage> {
                           SizedBox(height: 10,),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              ElevatedButton(
-                                onPressed:  () {},
+                            children: [ (owner!=null&&owner?.pubKey!=mWallet.account) ?
+                                ElevatedButton(
+                                        onPressed: _receiveNFT,
 
-                                style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
-                                  borderRadius: new BorderRadius.circular(10.0),
+                                        style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
+                                          borderRadius: new BorderRadius.circular(10.0),
 
-                                )
-                                ),
-                                child:  Container(padding: EdgeInsets.all(10),child: Text("Receive",style: TextStyle(fontSize: 20),)),
+                                        )
+                                        ),
+                                        child:  Container(
+                                            padding: EdgeInsets.all(10),
+                                            child: Text(
+                                              "Receive",
+                                              style: TextStyle(
+                                                  fontSize: 20
+                                              ),
+                                            ),
+                                        ),
+                                      ) :
+                            ElevatedButton(
+                              onPressed: (){
+                                _sendNFT(context);
+                                //showToast('swo za huinya?', context: context);
+                                },
+
+                              style: ElevatedButton.styleFrom(shape: new RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(10.0),
+
+                              )
                               ),
+                              child:  Container(
+                                padding: EdgeInsets.all(10),
+                                child: Text(
+                                  "Send",
+                                  style: TextStyle(
+                                      fontSize: 20
+                                  ),
+                                ),
+                              ),
+                            ) ,
                             ],
                           ),
                         ],
@@ -432,7 +484,8 @@ class _NFTPageState extends State<NFTPage> {
                                                 Clipboard.setData(ClipboardData(text: nft.contractAddress));
 
                                               },
-                                              child: Text(nft.contractAddress.substring(0,10)+"...", style: TextStyle(color: mColors.walletColor),)),
+                                              child: Text(nft.contractAddress.substring(0,6)+"..."+nft.contractAddress.substring(nft.contractAddress.length-4,nft.contractAddress.length) , style: TextStyle(color: mColors.walletColor),)
+                                          ),
                                         ],
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       ),
@@ -443,7 +496,18 @@ class _NFTPageState extends State<NFTPage> {
 
                                         children: [
                                           Text('Token ID'),
-                                          SelectableText(nft.tokenId.toString()),
+                                          TextButton(
+                                              onPressed: (){
+                                                showToast("Address copied",context:context);
+                                                Clipboard.setData(ClipboardData(text: nft.contractAddress));
+
+                                              },
+                                              child: Text(
+                                                nft.tokenId.length>15 ?
+                                                  nft.tokenId.substring(0,6)+"..."+nft.tokenId.substring(nft.tokenId.length-4,nft.tokenId.length) :
+                                                  nft.tokenId,
+                                                style: TextStyle(color: mColors.walletColor),)
+                                          ),
                                         ],
                                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       ),
@@ -504,5 +568,97 @@ class _NFTPageState extends State<NFTPage> {
           subject: '',);
     };
     return IconButton(onPressed: onPressed, icon: Icon(Icons.share, color: mColors.deepPurple));
+  }
+
+  Future<String> getMyName()async{
+
+    DbHelper dbh = DbHelper();
+
+    Database db = await dbh.openDB();
+
+    String userName = "User";
+
+    final user = await db.query('user_info');
+    if(!user.isEmpty) {
+      Map<String, dynamic> mapRead = user.first;
+      setState(() {
+        if (mapRead['user_name'] != null) {
+          userName = mapRead['user_name'];
+          //imagePath = mapRead['avatar'];
+        }
+      });
+
+    }
+
+    db.close();
+
+    return userName;
+  }
+
+  Future<String> getUserToken() async {
+    if(owner!=null) {
+      final userInfo = await Server.getUser(owner!.pubKey);
+      if (userInfo != "") {
+        return userInfo['fireToken'];
+      }
+    }
+    return '';
+
+  }
+
+  _receiveNFT()  async {
+      var name = await getMyName();
+      final token = await FirebaseHelper.getBearerToken();
+      print(token);
+      final userFcmToken = await getUserToken();
+
+      if (userFcmToken != "null"){
+
+        var responce = await http.post(
+          Uri.parse('https://fcm.googleapis.com/v1/projects/walletapp-5d95f/messages:send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization':'Bearer $token'
+          },
+          body: jsonEncode(<String, dynamic>{
+            "message": {
+              "token":userFcmToken,
+              "data": {
+                "message": "NFT request",
+                "token_id": nft.tokenId,
+                "token_name": nft.name,
+                "name": name,
+                "contract_id": nft.contractAddress,
+                "collection_name": nft.collectionName,
+                "pubKey": mWallet.account.toLowerCase(),
+              },
+              "notification":{
+                "title":"NFT request from $name (${mWallet.account.toString().substring(0,7)})",
+                "body":"0 ${mWallet.currentNet.coinName}"
+              },
+            },
+
+
+          }),
+        );
+
+        if(responce.statusCode == 200){
+          showToast("Request sent",context: context);
+        }else{
+          showToast("Something went wrong. Try again!",context: context);
+        }
+      }
+
+
+
+    }
+
+
+  Future<void> _sendNFT(BuildContext context) async {
+
+    Navigator.push(context, MaterialPageRoute(builder: (context){
+      return SendNFTActivity(nft: nft);
+    })
+    );
   }
 }

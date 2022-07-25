@@ -26,8 +26,19 @@ class DbHelper{
           db.execute('CREATE TABLE user_info(id	INTEGER PRIMARY KEY AUTOINCREMENT , user_name	TEXT, avatar	TEXT, wallet_address	TEXT, instagram TEXT)');
           db.execute('CREATE TABLE contacts(id	INTEGER PRIMARY KEY AUTOINCREMENT , user_name	TEXT, avatar	TEXT, wallet_address	TEXT)');
           db.execute('CREATE TABLE networks(id	INTEGER PRIMARY KEY AUTOINCREMENT , net_name	TEXT, rpc_url	TEXT, chain_id	TEXT, coin_name TEXT)');
-          db.execute('CREATE TABLE transactions(id	INTEGER PRIMARY KEY AUTOINCREMENT , wallet_address_from TEXT, wallet_address_my	TEXT, direction TEXT, coin_name TEXT, net_name TEXT, amount TEXT, date TEXT, tx_hash)');
-          //return db;
+          db.execute('CREATE TABLE transactions('
+              'id	INTEGER PRIMARY KEY AUTOINCREMENT , '
+              'wallet_address_from TEXT, '
+              'wallet_address_my	TEXT, '
+              'direction TEXT, coin_name '
+              'TEXT, net_name TEXT, '
+              'amount TEXT, '
+              'date TEXT, '
+              'nft_name TEXT, '
+              'nft_id TEXT, '
+              'nft_contract_id TEXT, '
+              'tx_hash'
+              ')');
       },
       version: 1,
     );

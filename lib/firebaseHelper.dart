@@ -171,8 +171,14 @@ class FirebaseHelper{
 
              if (payload != '') {
                final message = jsonDecode(payload);
-               navigatorKey.currentState?.pushNamed('/UserActivity',
-                   arguments: {'user':User(message['name'], message['pubKey']), 'message':message});
+
+               switch(message['message']){
+                 case 'Transaction request': navigatorKey.currentState?.pushNamed('/UserActivity',
+                     arguments: {'user':User(message['name'], message['pubKey']), 'message':message}); break;
+                 case 'NFT request': navigatorKey.currentState?.pushNamed('/SendNFTPage',
+                     arguments: {'user':User(message['name'], message['pubKey']), 'message':message}); break;
+
+               }
              }
            }
            //selectedNotificationPayload = payload;
@@ -238,6 +244,49 @@ class FirebaseHelper{
            );
 
 
+           break;
+         case "NFT request":
+           String name = await getUsernameByPubKey(message.data['pubKey'].toString());
+           name == 'User' ? name = message.data['name']: name = name;
+           String title = mes + " from " + name + " (${message.data['pubKey'].toString().substring(0,7)})";
+           String body =  message.data['token_name'].toString();
+
+           await flutterLocalNotificationsPlugin.show(
+             0,
+             title,
+             body,
+             platformChannelSpecifics,
+             payload: jsonEncode(message.data),
+           );
+
+
+           break;
+         case 'You received NFT':
+           String name = await getUsernameByPubKey(message.data['pubKey'].toString());
+           name == 'User' ? name = message.data['name']: name = name;
+           String title = mes + " from " + name + " (${message.data['pubKey'].toString().substring(0,7)})";
+           String body =  message.data['token_name'].toString();
+
+
+           mWallet.writeTransactionToHistory(
+             direction: 'income',
+             from:message.data['pubKey'] ,
+             me:message.data['to'] ,
+             net: message.data['net'],
+             nftName:message.data['token_name'],
+             nftId: message.data['token_id'],
+             nftContract: message.data['contract_id'],
+             txHash: message.data['tx'],
+           );
+
+
+           await flutterLocalNotificationsPlugin.show(
+             0,
+             title,
+             body,
+             platformChannelSpecifics,
+             payload: '',
+           );
            break;
 
        }

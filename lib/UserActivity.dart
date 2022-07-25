@@ -246,15 +246,96 @@ class _UserActivityPageState extends State<UserActivityPage> {
 
 
 
+  _changeNetworkTap () async {
+    mWallet.updateCallback = (){
+      setState(() {
+        if(mWallet.currentNet == mNetworks.unknownNet){
+          sendEnabled = false;
+          receiveEnabled = true;
+        }else {
+          sendEnabled = true;
+
+          if(userFcmToken!=''){
+            receiveEnabled = true;
+          }
+        }
+      });
+    };
+    AlertDialog ad = await buildNetworkDialog(context);
+    showDialog(context: context, builder: (context){
+      return ad;
+    }).then((net) async {
+      if(net!=null) {
+        final tx = await mWallet.changeNetwork(net);
+        print("Switch Chain TX: " + tx.toString());
+        if (tx is int) {
+          showToast('Chain switched to $tx', context: context,
+              duration: Duration(seconds: 5));
+        }
+        if (tx.toString() !=
+            'JSON-RPC error -32000: User rejected the request.') {
+          if (tx.toString().startsWith(
+              'JSON-RPC error -32000: Unrecognized chain ID')) {
+            requestAddChain(net);
+          } else {
+
+
+          }
+        }
+        else {
+          showToast('Request rejected',
+              context: context,
+              duration: Duration(
+                  seconds: 5));
+        }
+      }
+
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    final double itemHeight = (size.height - kToolbarHeight - 24) / 2.9;
     final double itemWidth = size.width / 2;
+    final double aspect = 0.8;
 
 
     return Scaffold(
       appBar: AppBar(
+
+        centerTitle: true,
+        title: Container(
+          margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+          child: Stack(
+            children: [
+              Column(
+                children: [
+                  Text("Current network", style: TextStyle(fontSize: 14, color: mColors.dark, letterSpacing:0.5 ),),
+                  Text(
+                    mWallet.currentNet.name,
+                    overflow: TextOverflow.ellipsis,
+
+                    style: TextStyle(fontSize: 10, color: mColors.dark, letterSpacing:0.5),
+                  ),
+                ],
+              ),
+              Positioned.fill(
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                  splashColor: mColors.transparent,
+                  overlayColor: MaterialStateProperty.all<Color>(mColors.transparent),
+                  highlightColor: mColors.antiShadowGray,
+                  onTap: _changeNetworkTap,
+            ),
+                ),
+              ),
+              
+            ],
+          ),
+        ),
+
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: (){
@@ -266,7 +347,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
         backgroundColor: mColors.light,
         foregroundColor: Colors.black,
         elevation: 1,
-        title: const Text(''),
+
         actions: instaEnabled? <Widget>[
           instagramButton(),
         ] : <Widget>[
@@ -803,7 +884,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                                 GridView.builder(
                                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
-                                        childAspectRatio: (itemWidth / itemHeight),
+                                        childAspectRatio: (aspect),
                                         crossAxisSpacing: 0,
                                         mainAxisSpacing: 0),
                                     itemCount: nfts.length,
@@ -846,8 +927,9 @@ class _UserActivityPageState extends State<UserActivityPage> {
                                                   splashColor: mColors.Gay,
                                                   onTap: (){
                                                     Navigator.push(context, MaterialPageRoute(builder: (context){
-                                                      return NFTScreen(nft: nfts[index]);
-                                                    }));
+                                                      return NFTScreen(nft: nfts[index], owner: user,);
+                                                    })
+                                                    );
                                                   },
                                                   child: Ink(
                                                     child: Column(

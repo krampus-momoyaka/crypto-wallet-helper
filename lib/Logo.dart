@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sqflite/sqflite.dart' as sqlite;
+import 'package:wallet_application/SendNFTPage.dart';
 import 'package:wallet_application/main.dart';
 import 'package:wallet_application/UserActivity.dart';
 import 'package:wallet_application/dbHelper.dart';
@@ -52,6 +53,15 @@ class MyApp extends StatelessWidget {
         }
         ),
       routes: {
+        '/SendNFTPage': (context) {
+          if(ModalRoute.of(context)?.settings.arguments!=null) {
+            final args = ModalRoute.of(context)!.settings.arguments as LinkedHashMap;
+            final user = args['user'] as User;
+            final data = args['message'];
+
+            return SendNFTActivity(user: user, data: data,);
+          } else return MyHomePage();
+        },
         '/UserActivity': (context) {
           if(ModalRoute.of(context)?.settings.arguments!=null) {
             final args = ModalRoute.of(context)!.settings.arguments as LinkedHashMap;

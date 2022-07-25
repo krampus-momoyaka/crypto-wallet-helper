@@ -38,7 +38,7 @@ class ContactListTileWidget extends StatelessWidget {
         user.name,
         style: style,
       ),
-      subtitle: Container(padding: EdgeInsets.fromLTRB(0, 8, 0, 0),child: Text(user.pubKey,style: TextStyle(overflow: TextOverflow.ellipsis),)),
+      subtitle: Container(padding: EdgeInsets.fromLTRB(0, 8, 0, 0),child: Text(user.pubKey.substring(0,6)+'...' + user.pubKey.substring(user.pubKey.length-4, user.pubKey.length),style: TextStyle(overflow: TextOverflow.ellipsis),)),
       trailing:
           isSelected ? Icon(Icons.check, color: selectedColor, size: 26) : null,
     );
