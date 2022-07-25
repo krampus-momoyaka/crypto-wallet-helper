@@ -14,11 +14,16 @@ mixin mColors {
   static const appBarColor = MaterialColor(0xFFFBFDFF, <int, Color>{0: Color(0xFFFBFDFF)});
   static const gold = Color(0xFFffd700);
   static const shadowGray = Color(0x30000000);
+  static const antiShadowGray = Color(0x80FFFFFF);
   static const waterBlue = Color(0x6A62C5E3);
   static const  lightGay = Color(0xffE5E8EB);
   static const dark = Color(0xFF1A1A1A);
   static const Natural = Color(0xFF7B7D83);
   static const deepPurple = Color(0xFF0C185E);
+  static const transparent = Color(0x00000000);
+  static const gray040 = Color(0xfff2f4f6);
+  static const aggressionRed = Color(0xffEF392E);
+  static const blue300 = Color(0xff3B8BEA);
 
 
 }
