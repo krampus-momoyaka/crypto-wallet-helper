@@ -191,7 +191,7 @@ class _SendNFTActivityPageState extends State<SendNFTActivityPage> {
   @override
   Widget build(BuildContext context) {
 
-    return Provider(
+    return ChangeNotifierProvider(
       create: (_) => ContactsProvider(),
       builder: (context, child){
         final provider = Provider.of<ContactsProvider>(context);
@@ -410,25 +410,27 @@ class _SendNFTActivityPageState extends State<SendNFTActivityPage> {
         ),
         onPressed: sendEnabled? () async {
 
-          notifyReceiver('0x0000000000000000000dead');
-          // final tx = await mWallet.sendNFT(nft, text);
-          //
-          // if (tx.isNotEmpty) {
-          //   if(tx == "JSON-RPC error -32000: User rejected the transaction") {
-          //     showToast("Transaction rejected", context: context, duration: Duration(seconds: 5));
-          //   }else{
-          //
-          //     showToast("Transaction sent", context: context, duration: Duration(seconds: 5));
-          //     notifyReceiver(tx);
-          //
-          //   }
-          //   await mWallet.updateBalance();
-          //
-          //   setState(() {
-          //
-          //   });
-          //
-          // }
+         // notifyReceiver('0x0000000000000000000dead');
+          if(nft!=null) {
+            final tx = await mWallet.sendNFT(nft!, text);
+
+            if (tx.isNotEmpty) {
+              if (tx ==
+                  "JSON-RPC error -32000: User rejected the transaction") {
+                showToast("Transaction rejected", context: context,
+                    duration: Duration(seconds: 5));
+              } else {
+                showToast("Transaction sent", context: context,
+                    duration: Duration(seconds: 5));
+                notifyReceiver(tx);
+              }
+              await mWallet.updateBalance();
+
+              setState(() {
+
+              });
+            }
+          }
 
         }:null,
       ),
@@ -491,6 +493,7 @@ class _SendNFTActivityPageState extends State<SendNFTActivityPage> {
             "pubKey": mWallet.account.toLowerCase(),
             "to": text,
             "tx": tx,
+            "net":mWallet.currentNet.rpcURL
           },
           "notification": {
             "title": "You received NFT from $name (${mWallet.account
@@ -529,7 +532,10 @@ class _SendNFTActivityPageState extends State<SendNFTActivityPage> {
         nftContract: nft!.contractAddress,
         txHash: tx,
     );
+    
+    Navigator.of(context).pop();
   }
+
 
 
 

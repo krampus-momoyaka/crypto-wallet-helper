@@ -494,8 +494,8 @@ import 'network.dart';
             'assets/abi/erc1155abi.json');
 
         final abi = DeployedContract(ContractAbi.fromJson(erc1155, 'ERC1155'),
-            EthereumAddress.fromHex(
-                '0x88B48F654c30e99bc2e4A1559b4Dcf1aD93FA656'));
+            EthereumAddress.fromHex(nft.contractAddress));
+
 
         final transfer = abi.function('safeTransferFrom');
 

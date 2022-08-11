@@ -38,15 +38,29 @@ class HistoryListTileWidget extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
 
-          Expanded(child:Container(
+          Container(
+            width: 75,
+
             margin: EdgeInsets.fromLTRB(16, 0, 0, 0),
             child: Text(
               tx.direction == "income" ? "Receive": "Send",
               style: style,
             ),
-          )),
+            ),
 
-          Text( tx.amount + " "+ tx.coinName  , style: TextStyle( color: tx.direction == "income"? Colors.green:Colors.red), ),
+          
+          tx.nftName!=null && tx.nftName!.isEmpty ?
+              Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+
+                      Flexible(child: Text( tx.amount,textAlign: TextAlign.end, overflow: TextOverflow.ellipsis, style: TextStyle( color: tx.direction == "income"? Colors.green:Colors.red), )),
+                      Text(' '+tx.coinName,style: TextStyle( color: tx.direction == "income"? Colors.green:Colors.red), ),
+                    ],
+                  )
+              )
+              : Expanded(child: Text(tx.nftName.toString(),textAlign: TextAlign.end, overflow: TextOverflow.ellipsis, style: TextStyle( color: tx.direction == "income"? Colors.green:Colors.red),)),
           Container(
               margin: EdgeInsets.fromLTRB(16, 0, 4, 0),
               child: Text(tx.date,style: TextStyle(fontSize: 14),),

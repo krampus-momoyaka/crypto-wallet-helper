@@ -47,7 +47,7 @@ dependencies:
   flutter_blue: ^0.8.0
   flutter_nearby_connections: ^1.1.1
   flutter_styled_toast: 2.0.0
-
+  transparent_image: ^2.0.0
 
 
   device_info: ^2.0.0

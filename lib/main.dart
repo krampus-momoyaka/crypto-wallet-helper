@@ -17,6 +17,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:wallet_application/Contacts/widget/avatar_widget.dart';
 import 'package:wallet_application/NFTHelper.dart';
 import 'package:wallet_application/NFTScreen.dart';
@@ -788,7 +789,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 
 
-                                            showToast(FirebaseHelper.notificationData,context: context);
+                                            showToast("Public Key copied",context: context);
                                             Clipboard.setData(ClipboardData(text: mWallet.account));
                                           },
                                           child: Container(
@@ -797,7 +798,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             decoration: BoxDecoration(color: Colors.transparent),
                                             child:
                                             Text(
-                                                mWallet.account,
+                                                mWallet.account.substring(0,8) + "..."+mWallet.account.substring(mWallet.account.length-4,mWallet.account.length),
                                                 overflow: TextOverflow.ellipsis
                                             ),
                                           ),
@@ -1072,10 +1073,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           crossAxisAlignment: CrossAxisAlignment.start,
                                                           children: [
                                                             Center(
-                                                                child: Image.network(
-                                                                  nfts[index].imageUrl,
+                                                                child: FadeInImage.memoryNetwork(
                                                                   height:itemWidth-20,
                                                                   fit: BoxFit.contain,
+                                                                  image: nfts[index].imageUrl,
+                                                                  placeholder: kTransparentImage,
                                                                 )
                                                             ),
                                                             Container(

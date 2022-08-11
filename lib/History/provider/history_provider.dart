@@ -18,8 +18,9 @@ class Trx{
     final String net;
     final String date;
     final String tx;
+    final String? nftName;
 
-    Trx(this.direction, this.from, this.me, this.amount, this.coinName, this.net, this.date, this.tx);
+    Trx(this.direction, this.from, this.me, this.amount, this.coinName, this.net, this.date, this.tx, this.nftName);
 
 }
 
@@ -64,7 +65,8 @@ class HistoryProvider with ChangeNotifier {
               mapRead['coin_name'],
               mapRead['net_name'],
               mapRead['date'],
-              mapRead['tx_hash']
+              mapRead['tx_hash'],
+              mapRead['nft_name']
           );
           trxList
             .add(_tx);

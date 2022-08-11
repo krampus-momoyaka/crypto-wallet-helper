@@ -11,6 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:transparent_image/transparent_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:wallet_application/NFTHelper.dart';
 import 'package:wallet_application/NFTScreen.dart';
@@ -511,13 +512,11 @@ class _UserActivityPageState extends State<UserActivityPage> {
                                           Clipboard.setData(ClipboardData(text: user.pubKey));
                                         },
                                         child: Container(
-                                          width: 200,
                                           margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
                                           padding: const EdgeInsets.all(10),
                                           decoration: BoxDecoration(color: Colors.transparent),
                                           child:
-                                          Text(
-                                              user.pubKey,
+                                          Text(user.pubKey.substring(0,8) + "..."+user.pubKey.substring(user.pubKey.length-4,user.pubKey.length),
                                               overflow: TextOverflow.ellipsis
                                           ),
                                         ),
@@ -580,95 +579,123 @@ class _UserActivityPageState extends State<UserActivityPage> {
                               margin: const EdgeInsets.fromLTRB(15, 0, 15, 10),
                               child: Text("Transaction via ${mWallet.provider?.connector.session.peerMeta?.name.toString()}",style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
                             ),
-                            Divider(
-                              height: 10,
-                            ),
-                            Container(
-                              margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
-                              child: Text("Your wallet",style: TextStyle(backgroundColor: Colors.transparent, fontSize: 15)
-                              ),
-                            ),
+                            // Divider(
+                            //   height: 10,
+                            // ),
+                            // Container(
+                            //   margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
+                            //   child: Text("Your wallet",style: TextStyle(backgroundColor: Colors.transparent, fontSize: 15)
+                            //   ),
+                            // ),
+                            // Divider(
+                            //   height: 1,
+                            //   color: Colors.transparent,
+                            // ),
+                            // Container(
+                            //   margin: EdgeInsets.fromLTRB(8,4,8,8),
+                            //   child: Column(
+                            //     children: [
+                            //       // Row(
+                            //       //   children:  <Widget>[
+                            //       //     Container(
+                            //       //       margin: const EdgeInsets.fromLTRB(20, 5, 27, 5),
+                            //       //       child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
+                            //       //     ),
+                            //       //     Flexible(
+                            //       //       child: Container(
+                            //       //         margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
+                            //       //         child: Material(
+                            //       //           color:  mColors.pubKeyColor,
+                            //       //           borderRadius: BorderRadius.circular(20),
+                            //       //           child: InkWell(
+                            //       //             borderRadius: BorderRadius.circular(20),
+                            //       //             onTap: () async {
+                            //       //               mWallet.updateCallback = (){
+                            //       //                 setState(() {
+                            //       //                   if(mWallet.currentNet == mNetworks.unknownNet){
+                            //       //                     sendEnabled = false;
+                            //       //                     receiveEnabled = true;
+                            //       //                   }else {
+                            //       //                     sendEnabled = true;
+                            //       //
+                            //       //                     if(userFcmToken!=''){
+                            //       //                       receiveEnabled = true;
+                            //       //                     }
+                            //       //                   }
+                            //       //                 });
+                            //       //               };
+                            //       //               AlertDialog ad = await buildNetworkDialog(context);
+                            //       //               showDialog(context: context, builder: (context){
+                            //       //                 return ad;
+                            //       //               }).then((net) async {
+                            //       //                  final tx = await mWallet.changeNetwork(net);
+                            //       //                  print("Switch Chain TX: "+tx.toString());
+                            //       //                  if(tx is int){
+                            //       //                    showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
+                            //       //
+                            //       //                  }
+                            //       //                  if (tx.toString() !=
+                            //       //                      'JSON-RPC error -32000: User rejected the request.') {
+                            //       //                    if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
+                            //       //                        requestAddChain(net);
+                            //       //                    } else {
+                            //       //
+                            //       //
+                            //       //                    }
+                            //       //                  }
+                            //       //                  else {
+                            //       //                    showToast('Request rejected',
+                            //       //                        context: context,
+                            //       //                        duration: Duration(
+                            //       //                            seconds: 5));
+                            //       //                  }
+                            //       //
+                            //       //               });
+                            //       //             },
+                            //       //             child: Container(
+                            //       //               margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
+                            //       //               padding: const EdgeInsets.all(10),
+                            //       //               decoration: BoxDecoration(color: Colors.transparent),
+                            //       //               child:
+                            //       //               Text(
+                            //       //                   mWallet.currentNet.name,
+                            //       //                   overflow: TextOverflow.ellipsis
+                            //       //               ),
+                            //       //             ),
+                            //       //           ),
+                            //       //         ),
+                            //       //       ),
+                            //       //     )
+                            //       //   ],
+                            //       // ),
+                            //
+                            //     ],
+                            //   ),
+                            // ),
+
+                            // Divider(
+                            //   height: 10,
+                            // ),
+
+                            // Container(
+                            //   margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
+                            //   child: Text("Send transaction",style: TextStyle(backgroundColor: Colors.transparent,fontSize: 15)
+                            //   ),
+                            // ),
+
                             Divider(
                               height: 1,
                               color: Colors.transparent,
                             ),
+
+
+
                             Container(
-                              margin: EdgeInsets.fromLTRB(8,4,8,8),
+                              margin: EdgeInsets.fromLTRB(8,8,8,8),
+                              padding: EdgeInsets.fromLTRB(4,10,10,4),
+
                               child: Column(
                                 children: [
-                                  Row(
-                                    children:  <Widget>[
-                                      Container(
-                                        margin: const EdgeInsets.fromLTRB(20, 5, 27, 5),
-                                        child: Text("Network:",style: TextStyle(fontWeight: FontWeight.bold),),
-                                      ),
-                                      Flexible(
-                                        child: Container(
-                                          margin: EdgeInsets.fromLTRB(0, 5, 0, 5),
-                                          child: Material(
-                                            color:  mColors.pubKeyColor,
-                                            borderRadius: BorderRadius.circular(20),
-                                            child: InkWell(
-                                              borderRadius: BorderRadius.circular(20),
-                                              onTap: () async {
-                                                mWallet.updateCallback = (){
-                                                  setState(() {
-                                                    if(mWallet.currentNet == mNetworks.unknownNet){
-                                                      sendEnabled = false;
-                                                      receiveEnabled = true;
-                                                    }else {
-                                                      sendEnabled = true;
-
-                                                      if(userFcmToken!=''){
-                                                        receiveEnabled = true;
-                                                      }
-                                                    }
-                                                  });
-                                                };
-                                                AlertDialog ad = await buildNetworkDialog(context);
-                                                showDialog(context: context, builder: (context){
-                                                  return ad;
-                                                }).then((net) async {
-                                                   final tx = await mWallet.changeNetwork(net);
-                                                   print("Switch Chain TX: "+tx.toString());
-                                                   if(tx is int){
-                                                     showToast('Chain switched to $tx', context: context, duration: Duration(seconds: 5));
-
-                                                   }
-                                                   if (tx.toString() !=
-                                                       'JSON-RPC error -32000: User rejected the request.') {
-                                                     if (tx.toString().startsWith('JSON-RPC error -32000: Unrecognized chain ID')) {
-                                                         requestAddChain(net);
-                                                     } else {
-
-
-                                                     }
-                                                   }
-                                                   else {
-                                                     showToast('Request rejected',
-                                                         context: context,
-                                                         duration: Duration(
-                                                             seconds: 5));
-                                                   }
-
-                                                });
-                                              },
-                                              child: Container(
-                                                margin: const EdgeInsets.fromLTRB(0, 0, 0, 0),
-                                                padding: const EdgeInsets.all(10),
-                                                decoration: BoxDecoration(color: Colors.transparent),
-                                                child:
-                                                Text(
-                                                    mWallet.currentNet.name,
-                                                    overflow: TextOverflow.ellipsis
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
                                   Row(
                                     children:  <Widget>[
                                       Container(
@@ -685,33 +712,7 @@ class _UserActivityPageState extends State<UserActivityPage> {
                                       )
                                     ],
                                   ),
-                                ],
-                              ),
-                            ),
-
-                            Divider(
-                              height: 10,
-                            ),
-
-                            Container(
-                              margin: EdgeInsets.fromLTRB(22, 15, 0, 10),
-                              child: Text("Send transaction",style: TextStyle(backgroundColor: Colors.transparent,fontSize: 15)
-                              ),
-                            ),
-
-                            Divider(
-                              height: 1,
-                              color: Colors.transparent,
-                            ),
-
-
-
-                            Container(
-                              margin: EdgeInsets.fromLTRB(8,8,8,8),
-                              padding: EdgeInsets.fromLTRB(4,10,10,4),
-
-                              child: Column(
-                                children: [
+                                  SizedBox(height: 10,),
                                   Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children:  <Widget>[
@@ -936,10 +937,11 @@ class _UserActivityPageState extends State<UserActivityPage> {
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       children: [
                                                         Center(
-                                                            child: Image.network(
-                                                              nfts[index].imageUrl,
+                                                            child: FadeInImage.memoryNetwork(
                                                               height:itemWidth-20,
                                                               fit: BoxFit.contain,
+                                                              image: nfts[index].imageUrl,
+                                                              placeholder: kTransparentImage,
                                                             )
                                                         ),
                                                         Container(

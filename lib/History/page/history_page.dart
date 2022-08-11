@@ -144,7 +144,7 @@ class _HistoryPageState extends State<HistoryPage> {
     final from = tx.from.substring(0,5) + "..."+ tx.from.substring(tx.from.length-4, tx.from.length);
     final me = tx.me.substring(0,5) + "..."+ tx.me.substring(tx.me.length-4, tx.me.length);
     AlertDialog ad =AlertDialog (
-      insetPadding: EdgeInsets.all(0),
+      insetPadding: EdgeInsets.all(10),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -256,14 +256,52 @@ class _HistoryPageState extends State<HistoryPage> {
 
           ),
           Divider(height: 40,),
-          Row(
+          tx.nftName!=null&& tx.nftName!='' ?
+              Row(
             //mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Amount: ', style: TextStyle(color: mColors.Gay, fontSize: 13),),
-              Text(
-                  tx.amount + " " + tx.coinName,
-                  style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: isSend?Colors.red:Colors.green,)
+              Text('NFT:  ', style: TextStyle(color: mColors.Gay, fontSize: 13),),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+
+                    Flexible(
+                      child: Text(
+                          tx.nftName.toString(), overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.end,
+                          maxLines: 2,
+                          style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: isSend?Colors.red:Colors.green,)
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+              :Row(
+            //mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Amount:  ', style: TextStyle(color: mColors.Gay, fontSize: 13),),
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+
+                    Flexible(
+                      child: Text(
+                          tx.amount, overflow: TextOverflow.ellipsis,
+                          style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: isSend?Colors.red:Colors.green,)
+                      ),
+                    ),
+                    Text(
+                        ' '+tx.coinName,
+                        style: TextStyle( fontSize: 20, fontWeight: FontWeight.bold, color: isSend?Colors.red:Colors.green,)
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
